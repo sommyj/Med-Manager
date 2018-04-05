@@ -15,7 +15,7 @@ android:
   components:
     - build-tools-26.0.2
     - android-26
-    - android-22
+    - android-21
     - extra
     - add-on
     - extra-google-m2repository
@@ -27,12 +27,12 @@ android:
     - extra-android-support
 
     - addon-google_apis-google-26
-    - addon-google_apis-google-22
+    - addon-google_apis-google-21
 
     # Specify at least one system image,
     # if you need to run emulator(s) during your tests
     - sys-img-armeabi-v7a-android-26
-    - sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-android-21
 
     licenses:
         - 'android-sdk-preview-license-52d11cd2'
@@ -53,7 +53,7 @@ android:
 
     # Emulator Management: Create, Start and Wait
     before_script:
-      - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+      - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
       - emulator -avd test -no-audio -no-window &
       - android-wait-for-emulator
       - adb shell input keyevent 82 &
