@@ -18,21 +18,21 @@ android:
     - android-22
     - extra
     - add-on
-    - extra-google-m2repository
-    - extra-android-m2repository
-
-    # Google Play Services
-    - extra-google-google_play_services
-    # Support library
-    - extra-android-support
-
-    - addon-google_apis-google-26
-    - addon-google_apis-google-22
-
-    # Specify at least one system image,
-    # if you need to run emulator(s) during your tests
-    - sys-img-armeabi-v7a-android-26
-    - sys-img-armeabi-v7a-android-22
+#    - extra-google-m2repository
+#    - extra-android-m2repository
+#
+#    # Google Play Services
+#    - extra-google-google_play_services
+#    # Support library
+#    - extra-android-support
+#
+#    - addon-google_apis-google-26
+#    - addon-google_apis-google-22
+#
+#    # Specify at least one system image,
+#    # if you need to run emulator(s) during your tests
+#    - sys-img-armeabi-v7a-android-26
+#    - sys-img-armeabi-v7a-android-22
 
     licenses:
         - 'android-sdk-preview-license-52d11cd2'
