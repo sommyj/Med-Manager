@@ -10,7 +10,7 @@
 
     <!-- RecyclerView that is responsible for holding a list of medication data -->
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerViewMedication"
+        android:id="@+id/medication_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="8dp" />

@@ -1,4 +1,35 @@
 <resources>
     <string name="app_name">Med-Manager</string>
     <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="action_save">Save</string>
+    <string name="action_edit">Edit</string>
+
+    <!--medication_layout-->
+    <string name="intervalIndicator_label">Every : </string>
+    <string name="timeLeftIndicator_label">Remaining : </string>
+
+    <!--activity_add_medication-->
+    <string name="addMedication_label">Add Medication</string>
+    <string name="medicationName_label">Name of Medication</string>
+    <string name="medicationDescription_label">Description</string>
+    <string name="interval_label">Interval/Frequency (hrs)</string>
+    <string name="startDate_label">Start Date</string>
+    <string name="endDate_label">End Date</string>
+
+    <!--activity_edit_profile-->
+    <string name="editProfile_label">Edit Profile</string>
+    <string name="profileName_label">Name</string>
+    <string name="profileUsername_label">Username</string>
+    <string name="profileLocation_label">Location</string>
+
+    <!--activity_medication_details-->
+    <string name="from_label">From : </string>
+    <string name="to_label">To : </string>
+    <string name="comma">, </string>
+
+    <!--drawer_view-->
+    <string name="nav_updateProfile">Update Profile</string>
+    <string name="nav_addMedication">Add Medication</string>
+    <string name="nav_logout">Logout</string>
 </resources>

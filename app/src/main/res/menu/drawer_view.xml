@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single"
+        android:id="@+id/menu_top">
+        <item
+            android:id="@+id/nav_updateProfile"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="@string/nav_updateProfile" />
+        <item
+            android:id="@+id/nav_addMedication"
+            android:icon="@android:drawable/ic_input_add"
+            android:title="@string/nav_addMedication" />
+    </group>
+
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@android:drawable/ic_menu_close_clear_cancel"
+            android:title="@string/nav_logout" />
+    </group>
+
+</menu>

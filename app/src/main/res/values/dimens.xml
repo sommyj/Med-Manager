@@ -1,3 +1,12 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="side_margin">10dp</dimen>
+    <dimen name="allSide_margin">5dp</dimen>
+
+    <dimen name="editText_margin">5dp</dimen>
+    <dimen name="editLabelTop_margin">20dp</dimen>
+    <dimen name="labelTopBottom_margin">25dp</dimen>
+
+    <dimen name="labelSpace">5dp</dimen>
+
 </resources>

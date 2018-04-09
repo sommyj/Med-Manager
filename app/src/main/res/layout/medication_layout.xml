@@ -1,35 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:elevation="4dp"
+    android:background="@drawable/shadow"
+    android:layout_margin="@dimen/allSide_margin">
 
     <LinearLayout
         android:id="@+id/top_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp">
 
         <TextView
             android:id="@+id/medTitle_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
+            android:layout_weight="4"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:paddingLeft="@dimen/side_margin"
             tools:text="gbbbbbbb" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingRight="@dimen/side_margin"
+            android:gravity="end">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Every : "/>
 
         <TextView
             android:id="@+id/medInterval_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:layout_weight="1"
-            android:gravity="end"
-            tools:text="gbbbbbbb" />
+            tools:text="12 hrs" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/medDescription_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/top_view"
-        tools:text="kkkkkkkkkkkk" />
-</RelativeLayout>
+        android:paddingLeft="@dimen/side_margin"
+        android:layout_marginRight="40dp"
+        android:ellipsize="end"
+        android:maxLines="4"
+        tools:text="kkkkkkkkkkkkjkbhhbbbhhbvhhhbhvjbbvhjbvhjbhhl;jhb;kb;sddvjbvbvbxcv;cbv;kjbc;kvbkjvb;xkcbbcbvjbjv;kbc;kzb;kbcjvbvjbk;jnbvn;vnjjbjjjjbvnjzjnjvjj'jv;ind jvjbfvkjkjz  bjvj jbjnbcj vnmvjnbj nc jck j j nkm jb j jn /x xn jb nj" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="@dimen/side_margin"
+        android:gravity="end">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remaining : "/>
+
+    <TextView
+        android:id="@+id/medTimeLeft_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="8 days" />
+    </LinearLayout>
+</LinearLayout>
