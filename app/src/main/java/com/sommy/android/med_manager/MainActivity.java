@@ -221,4 +221,17 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         startMedicationDetailsActivityIntent.putExtra(Intent.EXTRA_TEXT, strings);
         startActivity(startMedicationDetailsActivityIntent);
     }
+
+    /**
+     * If drawer is opened close it before exiting the application
+     */
+    @Override
+    public void onBackPressed() {
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+            mDrawerLayout.closeDrawers();
+        }else{
+            super.onBackPressed();
+        }
+
+    }
 }
