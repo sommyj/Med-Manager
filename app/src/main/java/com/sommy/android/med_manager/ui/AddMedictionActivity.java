@@ -1,4 +1,4 @@
-package com.sommy.android.med_manager;
+package com.sommy.android.med_manager.ui;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -14,6 +14,8 @@ import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
+
+import com.sommy.android.med_manager.R;
 
 import java.util.Calendar;
 

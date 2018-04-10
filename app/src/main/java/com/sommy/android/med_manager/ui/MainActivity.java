@@ -1,4 +1,4 @@
-package com.sommy.android.med_manager;
+package com.sommy.android.med_manager.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+
+import com.sommy.android.med_manager.model.ExpandedMenuModel;
+import com.sommy.android.med_manager.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;

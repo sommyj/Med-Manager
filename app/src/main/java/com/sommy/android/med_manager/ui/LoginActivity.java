@@ -1,4 +1,4 @@
-package com.sommy.android.med_manager;
+package com.sommy.android.med_manager.ui;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.sommy.android.med_manager.R;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 

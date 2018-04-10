@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.sommy.android.med_manager.MainActivity"
+    tools:context="com.sommy.android.med_manager.ui.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <!-- RecyclerView that is responsible for holding a list of medication data -->

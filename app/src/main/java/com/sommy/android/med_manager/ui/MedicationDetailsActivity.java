@@ -1,4 +1,4 @@
-package com.sommy.android.med_manager;
+package com.sommy.android.med_manager.ui;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.sommy.android.med_manager.R;
 
 public class MedicationDetailsActivity extends AppCompatActivity {
 

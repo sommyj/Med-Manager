@@ -1,4 +1,4 @@
-package com.sommy.android.med_manager;
+package com.sommy.android.med_manager.ui;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+
+import com.sommy.android.med_manager.model.ExpandedMenuModel;
+import com.sommy.android.med_manager.R;
 
 import java.util.HashMap;
 import java.util.List;

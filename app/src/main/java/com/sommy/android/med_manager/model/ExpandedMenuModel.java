@@ -1,4 +1,4 @@
-package com.sommy.android.med_manager;
+package com.sommy.android.med_manager.model;
 
 /**
  * Created by somto on 4/7/18.
