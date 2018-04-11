@@ -49,6 +49,14 @@
                 android:value=".ui.MainActivity"/>
         </activity>
 
+        <!-- Register the TaskContentProvider -->
+        <!-- Set name, authorities, and exported attributes -->
+        <!-- exported = false limits access to this ContentProvider to only this app -->
+        <provider
+            android:name=".provider.MedicationContentProvider"
+            android:authorities="com.sommy.android.med_manager"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

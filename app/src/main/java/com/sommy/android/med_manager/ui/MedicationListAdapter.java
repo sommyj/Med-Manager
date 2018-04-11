@@ -1,6 +1,7 @@
 package com.sommy.android.med_manager.ui;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sommy.android.med_manager.R;
+import com.sommy.android.med_manager.provider.MedicationContract;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by somto on 4/9/18.
@@ -16,11 +21,19 @@ import com.sommy.android.med_manager.R;
 public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAdapter.MedicationListAdapterViewHolder> {
 
     private final Context context;
+    private Cursor mCursor;
 
     /**
      *An on-click handler
      */
     private final MedicationListOnClickHandler mClickHandler;
+
+    private static SimpleDateFormat sDateFormat = new SimpleDateFormat("dd MMM");
+
+
+    private static final long MINUTE_MILLIS = 1000 * 60;
+    private static final long HOUR_MILLIS = 60 * MINUTE_MILLIS;
+    private static final long DAY_MILLIS = 24 * HOUR_MILLIS;
 
     private String[] a;
     private String[] b;
@@ -51,26 +64,100 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
 
     @Override
     public void onBindViewHolder(MedicationListAdapterViewHolder holder, int position) {
-        String medTitleString = a[position];
-        String medIntervalString = b[position];
-        String medDescriptionString = c[position];
-        String medTimeLeftString = d[position];
 
-        holder.medTitleTextView.setText(medTitleString);
-        holder.medIntervalTextView.setText(medIntervalString);
-        holder.medDescriptionTextView.setText(medDescriptionString);
-        holder.medTimeLeftTextView.setText(medTimeLeftString);
+        // Indices for the _id, name, description, interval, start_date and end_date columns
+        int idIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry._ID);
+        int nameIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_NAME);
+        int descriptionIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION);
+        int intervalIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_INTERVAL);
+        int startDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_START_DATE);
+        int endDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_END_DATE);
+
+        mCursor.moveToPosition(position); // get to the right location in the cursor
+
+        // Determine the values of the wanted data
+        final int id = mCursor.getInt(idIndex);
+        String name = mCursor.getString(nameIndex);
+        String description = mCursor.getString(descriptionIndex);
+        int interval = mCursor.getInt(intervalIndex);
+        long startDate = mCursor.getLong(startDateIndex);
+        long endDate = mCursor.getLong(endDateIndex);
+
+        String date = "";
+        long now = System.currentTimeMillis();
+
+        // Change how the date is displayed depending on whether it was written in the last minute,
+        // the hour, etc.
+        if (now - endDate < (DAY_MILLIS)) {
+            if (now - endDate < (HOUR_MILLIS)) {
+                long minutes = Math.round((now - endDate) / MINUTE_MILLIS);
+                date = String.valueOf(minutes) + "m";
+            } else {
+                long minutes = Math.round((now - endDate) / HOUR_MILLIS);
+                date = String.valueOf(minutes) + "h";
+            }
+        } else {
+            Date dateDate = new Date(endDate);
+            date = sDateFormat.format(dateDate);
+        }
+
+        // Add a dot to the date string
+        date = "\u2022 " + date;
+
+
+
+        //Set values
+        holder.itemView.setTag(id);
+        holder.medTitleTextView.setText(name);
+        holder.medDescriptionTextView.setText(description);
+        holder.medIntervalTextView.setText(String.valueOf(interval));
+        holder.medTimeLeftTextView.setText(String.valueOf(date));
+
+
+//        String medTitleString = a[position];
+//        String medIntervalString = b[position];
+//        String medDescriptionString = c[position];
+//        String medTimeLeftString = d[position];
+//
+//        holder.medTitleTextView.setText(medTitleString);
+//        holder.medIntervalTextView.setText(medIntervalString);
+//        holder.medDescriptionTextView.setText(medDescriptionString);
+//        holder.medTimeLeftTextView.setText(medTimeLeftString);
     }
 
+    /**
+     * Returns the number of items to display.
+     */
     @Override
     public int getItemCount() {
-        if(null == a) {
-            return 0;
-        }else {
-            return a.length;
-        }
+//        if(null == a) {
+//            return 0;
+//        }else {
+//            return a.length;
+//        }
+
+        if (mCursor == null) return 0;
+        return mCursor.getCount();
     }
 
+    /**
+     * When data changes and a re-query occurs, this function swaps the old Cursor
+     * with a newly updated Cursor (Cursor c) that is passed in.
+     */
+    public Cursor swapCursor(Cursor c) {
+        // check if this cursor is the same as the previous cursor (mCursor)
+        if (mCursor == c) {
+            return null; // bc nothing has changed
+        }
+        Cursor temp = mCursor;
+        this.mCursor = c; // new cursor value assigned
+
+        //check if this is a valid cursor, then update the cursor
+        if (c != null) {
+            this.notifyDataSetChanged(); // Force the RecyclerView to refresh
+        }
+        return temp;
+    }
 
     /**
      * The interface that receives onClick messages.

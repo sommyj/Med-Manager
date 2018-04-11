@@ -2,8 +2,11 @@ package com.sommy.android.med_manager.ui;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,19 +17,22 @@ import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.sommy.android.med_manager.R;
+import com.sommy.android.med_manager.provider.MedicationContract;
 
 import java.util.Calendar;
 
 public class AddMedictionActivity extends AppCompatActivity {
-    private EditText mMedicationNameEditText;
+    private EditText mNameEditText;
     private EditText mDescriptionEditText;
     private EditText mIntervalEditText;
     private EditText mStartDateEditText;
     private EditText mEndDateEditText;
 
-    private Calendar date;
+    private Calendar startDate;
+    private Calendar endDate;
     Context context = this;
 
     private static final String TAG = AddMedictionActivity.class.getSimpleName();
@@ -42,10 +48,15 @@ public class AddMedictionActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        mMedicationNameEditText = findViewById(R.id.medicationName_TextView);
+        mNameEditText = findViewById(R.id.name_EditText);
+        mDescriptionEditText = findViewById(R.id.description_EditText);
+        mIntervalEditText = findViewById(R.id.interval_EditText);
+        mStartDateEditText = findViewById(R.id.startDate_EditText);
+        mEndDateEditText = findViewById(R.id.endDate_EditText);
 
-        mStartDateEditText = findViewById(R.id.startDate_TextView);
-        mEndDateEditText = findViewById(R.id.endDate_TextView);
+
+        startDate = Calendar.getInstance();
+        endDate = Calendar.getInstance();
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -63,18 +74,17 @@ public class AddMedictionActivity extends AppCompatActivity {
 
                 if(hasFocus) {
                     final Calendar currentDate = Calendar.getInstance();
-                    date = Calendar.getInstance();
                     new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            date.set(year, monthOfYear, dayOfMonth);
+                            startDate.set(year, monthOfYear, dayOfMonth);
                             new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    date.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    date.set(Calendar.MINUTE, minute);
-                                    Log.v(TAG, "The choosen one " + date.getTime());
-                                    mStartDateEditText.setText("" + date.getTime());
+                                    startDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                    startDate.set(Calendar.MINUTE, minute);
+                                    Log.v(TAG, "The choosen one " + startDate.getTime());
+                                    mStartDateEditText.setText("" + startDate.getTime());
                                 }
                             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
                         }
@@ -93,18 +103,17 @@ public class AddMedictionActivity extends AppCompatActivity {
 
                 if (hasFocus) {
                     final Calendar currentDate = Calendar.getInstance();
-                    date = Calendar.getInstance();
                     new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            date.set(year, monthOfYear, dayOfMonth);
+                            endDate.set(year, monthOfYear, dayOfMonth);
                             new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                    date.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    date.set(Calendar.MINUTE, minute);
-                                    Log.v(TAG, "The choosen one " + date.getTime());
-                                    mEndDateEditText.setText("" + date.getTime());
+                                    endDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                                    endDate.set(Calendar.MINUTE, minute);
+                                    Log.v(TAG, "The choosen one " + endDate.getTime());
+                                    mEndDateEditText.setText("" + endDate.getTime());
 //                                    mEndDateEditText.clearFocus();
                                 }
                             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
@@ -124,7 +133,44 @@ public class AddMedictionActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int itemThatWasSelected = menuItem.getItemId();
         if (itemThatWasSelected == R.id.action_save) {
+            // If the EditText input is empty -> don't create an entry
+            String nameString = mNameEditText.getText().toString();
+            String descriptionString = mDescriptionEditText.getText().toString();
+            String intervalString = mIntervalEditText.getText().toString();
+            String startDateString = mStartDateEditText.getText().toString();
+            String endDateString = mEndDateEditText.getText().toString();
 
+            if(nameString.length()==0||descriptionString.length()==0||intervalString.length()==0
+                    ||startDateString.length()==0||endDateString.length() == 0) {
+                Snackbar.make(findViewById(android.R.id.content), "All fields are required", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                return false;
+            }
+
+            //Converting to there appropriate values for db insertion
+            int intervalInt = Integer.parseInt(intervalString);
+            long startDateLong = startDate.getTimeInMillis();
+            long endDateLong = endDate.getTimeInMillis();
+
+                // Insert new task data via a ContentResolver
+                // Create new empty ContentValues object
+                ContentValues contentValues = new ContentValues();
+                // Put the medication values into the ContentValues
+                contentValues.put(MedicationContract.MedicationEntry.COLUMN_NAME, nameString);
+                contentValues.put(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION, descriptionString);
+                contentValues.put(MedicationContract.MedicationEntry.COLUMN_INTERVAL, intervalInt);
+                contentValues.put(MedicationContract.MedicationEntry.COLUMN_START_DATE, startDateLong);
+                contentValues.put(MedicationContract.MedicationEntry.COLUMN_END_DATE, endDateLong);
+                // Insert the content values via a ContentResolver
+                Uri uri = getContentResolver().insert(MedicationContract.MedicationEntry.CONTENT_URI, contentValues);
+
+                // Display the URI that's returned with a Toast
+                if(uri != null) {
+                    Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+                }
+
+                // Finish activity (this returns back to MainActivity)
+                finish();
         }
         return super.onOptionsItemSelected(menuItem);
     }
