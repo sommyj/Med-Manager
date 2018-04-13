@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -22,7 +23,10 @@ import android.widget.Toast;
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.provider.MedicationContract;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class AddMedictionActivity extends AppCompatActivity {
     private EditText mNameEditText;
@@ -31,9 +35,12 @@ public class AddMedictionActivity extends AppCompatActivity {
     private EditText mStartDateEditText;
     private EditText mEndDateEditText;
 
+    private String[] valuesFromMedicationDetailsActivity;
     private Calendar startDate;
     private Calendar endDate;
-    Context context = this;
+    private Context context = this;
+
+    private SimpleDateFormat sDateFormat =new SimpleDateFormat("E, MMM dd yyyy HH:mm:ss");
 
     private static final String TAG = AddMedictionActivity.class.getSimpleName();
 
@@ -58,11 +65,26 @@ public class AddMedictionActivity extends AppCompatActivity {
         startDate = Calendar.getInstance();
         endDate = Calendar.getInstance();
 
+        //To hide input state eg. keyboard on creation
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         setFocusOnStartDateEditText(mStartDateEditText);
 
         setFocusOnEndDateEditText(mEndDateEditText);
+
+        Intent intentThatStartedThisActivity = getIntent();
+
+        if(intentThatStartedThisActivity.hasExtra("valuesForAddmedicationActivity")) {
+            setTitle(R.string.editMedication_label);
+            valuesFromMedicationDetailsActivity = intentThatStartedThisActivity.getStringArrayExtra("valuesForAddmedicationActivity");
+
+            //set values on view
+            mNameEditText.setText(valuesFromMedicationDetailsActivity[1]);
+            mDescriptionEditText.setText(valuesFromMedicationDetailsActivity[2]);
+            mIntervalEditText.setText(valuesFromMedicationDetailsActivity[3]);
+            mStartDateEditText.setText(valuesFromMedicationDetailsActivity[4]);
+            mEndDateEditText.setText(valuesFromMedicationDetailsActivity[5]);
+        }
 
 
     }
@@ -84,7 +106,9 @@ public class AddMedictionActivity extends AppCompatActivity {
                                     startDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                     startDate.set(Calendar.MINUTE, minute);
                                     Log.v(TAG, "The choosen one " + startDate.getTime());
-                                    mStartDateEditText.setText("" + startDate.getTime());
+
+                                    String startDateString = sDateFormat.format(startDate.getTimeInMillis());
+                                        mStartDateEditText.setText(startDateString);
                                 }
                             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
                         }
@@ -113,8 +137,9 @@ public class AddMedictionActivity extends AppCompatActivity {
                                     endDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                                     endDate.set(Calendar.MINUTE, minute);
                                     Log.v(TAG, "The choosen one " + endDate.getTime());
-                                    mEndDateEditText.setText("" + endDate.getTime());
-//                                    mEndDateEditText.clearFocus();
+
+                                    String endDateString = sDateFormat.format(endDate.getTimeInMillis());
+                                    mEndDateEditText.setText(endDateString);
                                 }
                             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
                         }
@@ -142,17 +167,27 @@ public class AddMedictionActivity extends AppCompatActivity {
 
             if(nameString.length()==0||descriptionString.length()==0||intervalString.length()==0
                     ||startDateString.length()==0||endDateString.length() == 0) {
-                Snackbar.make(findViewById(android.R.id.content), "All fields are required", Snackbar.LENGTH_LONG)
+                Snackbar.make(findViewById(android.R.id.content), getResources().getString(R.string.addMediction_validation), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                return false;
+            }
+
+            Date startDate = null;
+            Date endDate = null;
+            try {
+                startDate =sDateFormat.parse(startDateString);
+                endDate =sDateFormat.parse(endDateString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.date_error), Toast.LENGTH_LONG).show();
                 return false;
             }
 
             //Converting to there appropriate values for db insertion
             int intervalInt = Integer.parseInt(intervalString);
-            long startDateLong = startDate.getTimeInMillis();
-            long endDateLong = endDate.getTimeInMillis();
-
-                // Insert new task data via a ContentResolver
+            long startDateLong = startDate.getTime();
+            long endDateLong = endDate.getTime();
+            // Insert new task data via a ContentResolver
                 // Create new empty ContentValues object
                 ContentValues contentValues = new ContentValues();
                 // Put the medication values into the ContentValues
@@ -161,13 +196,32 @@ public class AddMedictionActivity extends AppCompatActivity {
                 contentValues.put(MedicationContract.MedicationEntry.COLUMN_INTERVAL, intervalInt);
                 contentValues.put(MedicationContract.MedicationEntry.COLUMN_START_DATE, startDateLong);
                 contentValues.put(MedicationContract.MedicationEntry.COLUMN_END_DATE, endDateLong);
-                // Insert the content values via a ContentResolver
-                Uri uri = getContentResolver().insert(MedicationContract.MedicationEntry.CONTENT_URI, contentValues);
 
-                // Display the URI that's returned with a Toast
-                if(uri != null) {
-                    Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
+            if(valuesFromMedicationDetailsActivity == null) {
+                // Insert the content values via a ContentResolver
+                Uri addUri = getContentResolver().insert(MedicationContract.MedicationEntry.CONTENT_URI, contentValues);
+
+                // Display the status that's returned with a Toast
+                if (addUri != null) {
+                    Log.v(TAG, "uri.toString()");
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.insert_success), Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.insert_success), Toast.LENGTH_LONG).show();
+                    return false;
                 }
+            }else {
+                Uri updateUri = MedicationContract.MedicationEntry.CONTENT_URI;
+                updateUri = updateUri.buildUpon().appendPath(valuesFromMedicationDetailsActivity[0]).build();
+
+                int updatedCount = getContentResolver().update(updateUri, contentValues, null, null);
+                if(updatedCount == 1) {
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.update_success), Toast.LENGTH_LONG).show();
+                } else{
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.update_error), Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+
 
                 // Finish activity (this returns back to MainActivity)
                 finish();

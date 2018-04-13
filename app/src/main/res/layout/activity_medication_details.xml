@@ -19,6 +19,7 @@
         android:gravity="center_horizontal"
         android:textSize="34sp"
         android:textStyle="bold"
+        android:textAllCaps="true"
         tools:text="Anti-Parasite" />
 
     <View
@@ -36,7 +37,8 @@
         android:layout_marginTop="@dimen/editLabelTop_margin"
         android:layout_marginLeft="@dimen/side_margin"
         android:paddingLeft="@dimen/side_margin"
-        android:layout_marginRight="40dp"
+        android:layout_marginRight="@dimen/side_margin"
+        android:gravity="center_horizontal"
         android:ellipsize="end"
         android:maxLines="8"
         tools:text="kkkkkkkkkkkkjkbhhbbbhhbvhhhbhvjbbvhjbvhjbhhl;jhb;kb;sddvjbvbvbxcv;cbv;kjbc;kvbkjvb;xkcbbcbvjbjv;kbc;kzb;kbcjvbvjbk;jnbvn;vnjjbjjjjbvnjzjnjvjj'jv;ind jvjbfvkjkjz  bjvj jbjnbcj vnmvjnbj nc jck j j nkm jb j jn /x xn jb nj" />
@@ -98,19 +100,7 @@
             android:layout_marginLeft="@dimen/labelSpace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="2:30pm" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/comma" />
-
-        <TextView
-            android:id="@+id/detailFromDate_textView"
-            android:layout_marginLeft="@dimen/labelSpace"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="3rd fed 2018" />
+            tools:text="2:30pm, 3rd fed 2018" />
 
     </LinearLayout>
 
@@ -133,19 +123,8 @@
         android:layout_marginLeft="@dimen/labelSpace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="3:30pm" />
+        tools:text="3:30pm, 3rd fed 2018" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/comma" />
-
-    <TextView
-        android:id="@+id/detailToDate_textView"
-        android:layout_marginLeft="@dimen/labelSpace"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="3rd fed 2018" />
 </LinearLayout>
 
 </LinearLayout>

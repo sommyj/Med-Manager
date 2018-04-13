@@ -5,17 +5,22 @@
     <string name="action_save">Save</string>
     <string name="action_edit">Edit</string>
 
+    <!--activity_main & content_main-->
+    <string name="tutorial_message">Click the add button to add medication</string>
+
     <!--medication_layout-->
     <string name="intervalIndicator_label">Every : </string>
     <string name="timeLeftIndicator_label">Remaining : </string>
 
     <!--activity_add_medication-->
     <string name="addMedication_label">Add Medication</string>
+    <string name="editMedication_label">Edit Medication</string>
     <string name="medicationName_label">Name of Medication</string>
     <string name="medicationDescription_label">Description</string>
     <string name="interval_label">Interval/Frequency (hrs)</string>
     <string name="startDate_label">Start Date</string>
     <string name="endDate_label">End Date</string>
+
 
     <!--activity_edit_profile-->
     <string name="editProfile_label">Edit Profile</string>
@@ -32,4 +37,17 @@
     <string name="nav_updateProfile">Update Profile</string>
     <string name="nav_addMedication">Add Medication</string>
     <string name="nav_logout">Logout</string>
+
+    <string name="minute">min</string>
+    <string name="hour">hrs</string>
+    <string name="day">day</string>
+
+    <string name="addMediction_validation">All fields are required</string>
+
+    <string name="date_error">Wrong date format</string>
+    <string name="insert_error">Something went wrong in inserting data</string>
+    <string name="update_error">Something went wrong in updating data</string>
+
+    <string name="insert_success">Insertion Successful</string>
+    <string name="update_success">Updated Successfully!!!!</string>
 </resources>

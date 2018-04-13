@@ -34,21 +34,11 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
     private static final long MINUTE_MILLIS = 1000 * 60;
     private static final long HOUR_MILLIS = 60 * MINUTE_MILLIS;
     private static final long DAY_MILLIS = 24 * HOUR_MILLIS;
+    private static final long WEEK_MILLIS = 7 * DAY_MILLIS;
 
-    private String[] a;
-    private String[] b;
-    private String[] c;
-    private String[] d;
-    private String[] e;
-
-    public MedicationListAdapter(Context context, MedicationListOnClickHandler medicationListOnClickHandler, String[] a, String[] b, String[] c, String[] d, String[] e) {
+    public MedicationListAdapter(Context context, MedicationListOnClickHandler medicationListOnClickHandler) {
         this.context = context;
         this.mClickHandler = medicationListOnClickHandler;
-        this.a = a;
-        this.b = b;
-        this.c = c;
-        this.d = d;
-        this.e = e;
     }
 
     @Override
@@ -88,41 +78,37 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
 
         // Change how the date is displayed depending on whether it was written in the last minute,
         // the hour, etc.
-        if (now - endDate < (DAY_MILLIS)) {
-            if (now - endDate < (HOUR_MILLIS)) {
-                long minutes = Math.round((now - endDate) / MINUTE_MILLIS);
-                date = String.valueOf(minutes) + "m";
-            } else {
-                long minutes = Math.round((now - endDate) / HOUR_MILLIS);
-                date = String.valueOf(minutes) + "h";
+        if(endDate > now) {
+            if (endDate - now < (WEEK_MILLIS)){
+                if (endDate - now < (DAY_MILLIS)) {
+                    if (endDate - now < (HOUR_MILLIS)) {
+                        long minutes = Math.round((endDate - now) / MINUTE_MILLIS);
+                        date = String.valueOf(minutes) +" "+context.getResources().getString(R.string.minute);
+                    } else {
+                        long minutes = Math.round((endDate - now) / HOUR_MILLIS);
+                        date = String.valueOf(minutes) +" "+context.getResources().getString(R.string.hour);
+                    }
+                } else {
+                    long minutes = Math.round((endDate - now) / DAY_MILLIS);
+                    date = String.valueOf(minutes) +" "+context.getResources().getString(R.string.day);
+                }
+            } else{
+                Date dateDate = new Date(endDate);
+                date = sDateFormat.format(dateDate);
             }
-        } else {
-            Date dateDate = new Date(endDate);
-            date = sDateFormat.format(dateDate);
+        }else {
+            date = "ended";
         }
 
-        // Add a dot to the date string
-        date = "\u2022 " + date;
-
-
+        String intervalString = String.valueOf(interval) +" "+context.getResources().getString(R.string.hour);
 
         //Set values
         holder.itemView.setTag(id);
         holder.medTitleTextView.setText(name);
         holder.medDescriptionTextView.setText(description);
-        holder.medIntervalTextView.setText(String.valueOf(interval));
-        holder.medTimeLeftTextView.setText(String.valueOf(date));
+        holder.medIntervalTextView.setText(intervalString);
+        holder.medTimeLeftTextView.setText(date);
 
-
-//        String medTitleString = a[position];
-//        String medIntervalString = b[position];
-//        String medDescriptionString = c[position];
-//        String medTimeLeftString = d[position];
-//
-//        holder.medTitleTextView.setText(medTitleString);
-//        holder.medIntervalTextView.setText(medIntervalString);
-//        holder.medDescriptionTextView.setText(medDescriptionString);
-//        holder.medTimeLeftTextView.setText(medTimeLeftString);
     }
 
     /**
@@ -130,12 +116,6 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
      */
     @Override
     public int getItemCount() {
-//        if(null == a) {
-//            return 0;
-//        }else {
-//            return a.length;
-//        }
-
         if (mCursor == null) return 0;
         return mCursor.getCount();
     }
@@ -163,7 +143,7 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
      * The interface that receives onClick messages.
      */
     interface MedicationListOnClickHandler {
-        void onClick(String[] strings);
+        void onClick(String string);
     }
 
     /**
@@ -191,14 +171,14 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            String medTitleString = a[position];
-            String medIntervalString = b[position];
-            String medDescriptionString = c[position];
-            String medStartDateString = d[position];
-            String medEndDateString = e[position];
 
-            String[] strings = {medTitleString, medIntervalString, medDescriptionString, medStartDateString, medEndDateString};
-            mClickHandler.onClick(strings);
+            mCursor.moveToPosition(position); // get to the right location in the cursor
+
+//            // Determine the values of the wanted data
+            int idInt = mCursor.getInt(mCursor.getColumnIndex(MedicationContract.MedicationEntry._ID));
+            String idString = String.valueOf(idInt);
+
+            mClickHandler.onClick(idString);
         }
     }
 }

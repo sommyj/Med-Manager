@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_START_DATE;
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.TABLE_NAME;
 
 /**
@@ -84,16 +83,27 @@ public class MedicationContentProvider extends ContentProvider {
                         sortOrder);
                 break;
             case MEDICATION_WITH_ID:
-            selection = COLUMN_START_DATE + "=?";
-                String startDate = uri.getPathSegments().get(1);
+                selection = "_id=?";
+                String id = uri.getPathSegments().get(1);
                 retCursor = db.query(TABLE_NAME,
                         projection,
                         selection,
-                        new String[]{startDate},
+                        new String[]{id},
                         null,
                         null,
                         sortOrder);
                 break;
+//            case MEDICATION_WITH_START_DATE:
+//            selection = COLUMN_START_DATE + "=?";
+//                String startDate = uri.getPathSegments().get(1);
+//                retCursor = db.query(TABLE_NAME,
+//                        projection,
+//                        selection,
+//                        new String[]{startDate},
+//                        null,
+//                        null,
+//                        sortOrder);
+//                break;
             // Default exception
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

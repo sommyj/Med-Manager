@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.model.ExpandedMenuModel;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     private RecyclerView mMedicationRecyclerView;
     private ProgressBar mLoadingIndicator;
     private MedicationListAdapter medicationListAdapter;
+    private TextView mTutorialTextView;
 
     //Expandable List
     private DrawerLayout mDrawerLayout;
@@ -49,14 +51,6 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     private ExpandableListView expandableList;
     private List<ExpandedMenuModel> listDataHeader;
     private HashMap<ExpandedMenuModel, List<String>> listDataChild;
-
-     String[] a = {"cofflin", "lonart", "Amartem"};
-     String[] b = {"2 hrs", "2 hrs", "3 hrs"};
-     String[] c = {"lorem pepsin, trun, fjfjjf kfkfkf losem kfffmfm,fmffkfkf fkkrkrkrkkkfkkflfk kkfkfk",
-            "lorem pepsin, trun, fjfjjf kfkfkf losem kfffmfm,fmffkfkf fkkrkrkrkkkfkfklflfk kkfkfk",
-            "lorem pepsin, trun, fjfjjf kfkfkf losem kfffmfm,fmffkfkf fkkrkrkrkkkfklflkflfk kkfkfk"};
-     String[] d = {"2 hrs", "2 days", "3 days"};
-    String[] e = {"4 hrs", "5 days", "6 days"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
+        mTutorialTextView = findViewById(R.id.tutorial_textView);
         mMedicationRecyclerView = findViewById(R.id.medication_recyclerView);
 
         /*
@@ -83,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         mMedicationRecyclerView.setLayoutManager(layoutManager);
 
         mMedicationRecyclerView.setHasFixedSize(true);
-        medicationListAdapter = new MedicationListAdapter(this, this, a,b,c,d,e);
+        medicationListAdapter = new MedicationListAdapter(this, this);
 
         mMedicationRecyclerView.setAdapter(medicationListAdapter);
 
@@ -242,12 +237,12 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     /**
      * If an item is clicked it launches you to the child class(MedicationDetailsActivity.java).
      * and it passes some info with the use of intent.
-     * @param strings The Medication data to be displayed.
+     * @param string The Medication data to be passed to MedicationDetailsActivity.
      */
     @Override
-    public void onClick(String[] strings) {
+    public void onClick(String string) {
         Intent startMedicationDetailsActivityIntent = new Intent(MainActivity.this, MedicationDetailsActivity.class);
-        startMedicationDetailsActivityIntent.putExtra(Intent.EXTRA_TEXT, strings);
+        startMedicationDetailsActivityIntent.putExtra(Intent.EXTRA_TEXT, string);
         startActivity(startMedicationDetailsActivityIntent);
     }
 
@@ -277,9 +272,10 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
             case MEDICATION_LOADER_ID:
         Uri medication_uri = null;
 
-        if(args == null)
+
             medication_uri = CONTENT_URI;
-        else
+
+            if(args != null)
             medication_uri = medication_uri.buildUpon().appendPath(args.getString("")).build();
 
         return new CursorLoader(this, medication_uri, null, null, null, COLUMN_START_DATE+" DESC");
@@ -300,7 +296,11 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         data.moveToFirst();
         medicationListAdapter.swapCursor(data);
 
-        showWeatherDataView();
+        if(data.getCount() == 0)
+            showTutorialTextView();
+
+
+        showMedicationDataView();
     }
 
     /**
@@ -316,16 +316,18 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     }
 
     /**
-     * This method will make the View for the weather data visible and hide the error message and
+     * This method will make the View for the medication data visible and hide the tutorial message and
      * loading indicator.
      * <p>
      * Since it is okay to redundantly set the visibility of a View, we don't need to check whether
      * each view is currently visible or invisible.
      */
-    private void showWeatherDataView() {
+    private void showMedicationDataView() {
         /* First, hide the loading indicator */
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        /* Finally, make sure the weather data is visible */
+        /* Second, hide the tutorial message */
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        /* Finally, make sure the medication data is visible */
         mMedicationRecyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -336,9 +338,22 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
      * each view is currently visible or invisible.
      */
     private void showLoading() {
-        /* Then, hide the weather data */
+        /* Then, hide the medication data */
         mMedicationRecyclerView.setVisibility(View.INVISIBLE);
         /* Finally, show the loading indicator */
         mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * This method will make the tutorial message visible and hide the medication list View
+     <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't need to check whether
+     * each view is currently visible or invisible.
+     */
+    private void showTutorialTextView(){
+        /* Then, hide the medication data */
+        mMedicationRecyclerView.setVisibility(View.INVISIBLE);
+        /* Finally, show the tutorial message */
+        mTutorialTextView.setVisibility(View.VISIBLE);
     }
 }
