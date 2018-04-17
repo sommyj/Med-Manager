@@ -21,6 +21,7 @@
             android:layout_weight="4"
             android:paddingLeft="@dimen/side_margin"
             android:paddingStart="@dimen/side_margin"
+            android:paddingRight="@dimen/side_margin"
             android:textAllCaps="true"
             android:textStyle="bold"
             tools:text="gbbbbbbb" />
@@ -30,6 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
+            android:paddingLeft="@dimen/side_margin"
             android:paddingEnd="@dimen/side_margin"
             android:paddingRight="@dimen/side_margin">
 
@@ -58,6 +60,7 @@
         android:maxLines="4"
         android:paddingLeft="@dimen/side_margin"
         android:paddingStart="@dimen/side_margin"
+        android:paddingRight="@dimen/side_margin"
         tools:text="kkkkkkkkkkkkjkbhhbbbhhbvhhhbhvjbbvhjbvhjbhhl;jhb;kb;sddvjbvbvbxcv;cbv;kjbc;kvbkjvb;xkcbbcbvjbjv;kbc;kzb;kbcjvbvjbk;jnbvn;vnjjbjjjjbvnjzjnjvjj'jv;ind jvjbfvkjkjz  bjvj jbjnbcj vnmvjnbj nc jck j j nkm jb j jn /x xn jb nj" />
 
     <LinearLayout
@@ -66,7 +69,8 @@
         android:gravity="end"
         android:paddingBottom="@dimen/side_margin"
         android:paddingEnd="@dimen/side_margin"
-        android:paddingRight="@dimen/side_margin">
+        android:paddingRight="@dimen/side_margin"
+        android:paddingLeft="@dimen/side_margin">
 
         <TextView
             android:layout_width="wrap_content"

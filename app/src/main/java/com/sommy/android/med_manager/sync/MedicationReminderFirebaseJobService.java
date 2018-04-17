@@ -1,10 +1,13 @@
 package com.sommy.android.med_manager.sync;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
+import com.firebase.jobdispatcher.RetryStrategy;
 import com.sommy.android.med_manager.utilities.NotificationUtils;
 
 /**
@@ -26,6 +29,7 @@ public class MedicationReminderFirebaseJobService extends JobService {
      * @return whether there is more work remaining.
      */
 
+    @SuppressLint("StaticFieldLeak")
     @Override
     public boolean onStartJob(final JobParameters job) {
         mBackgroundTask = new AsyncTask() {

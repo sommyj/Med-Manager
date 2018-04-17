@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background_img"
     android:orientation="vertical"
+    tools:ignore="Overdraw"
     tools:context="com.sommy.android.med_manager.ui.LoginActivity">
 
     <com.sommy.android.med_manager.ui.CustomTextView

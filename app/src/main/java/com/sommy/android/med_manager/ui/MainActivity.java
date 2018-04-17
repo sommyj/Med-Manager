@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent startAddMedicationActivityIntent = new Intent(MainActivity.this, AddMedictionActivity.class);
+                Intent startAddMedicationActivityIntent = new Intent(MainActivity.this, AddMedicationActivity.class);
                 startActivity(startAddMedicationActivityIntent);
             }
         });
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
                                 break;
 
                             case R.id.nav_addMedication :
-                                Intent startAddMedicationActivityIntent = new Intent(MainActivity.this, AddMedictionActivity.class);
+                                Intent startAddMedicationActivityIntent = new Intent(MainActivity.this, AddMedicationActivity.class);
                                 startActivity(startAddMedicationActivityIntent);
                                 break;
 

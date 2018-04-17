@@ -31,7 +31,7 @@ import java.util.Date;
 
 import static java.text.DateFormat.getDateTimeInstance;
 
-public class AddMedictionActivity extends AppCompatActivity {
+public class AddMedicationActivity extends AppCompatActivity {
     private EditText mNameEditText;
     private EditText mDescriptionEditText;
     private EditText mIntervalEditText;
@@ -46,7 +46,7 @@ public class AddMedictionActivity extends AppCompatActivity {
 
     private DateFormat sDateFormat = getDateTimeInstance();
 
-    private static final String TAG = AddMedictionActivity.class.getSimpleName();
+    private static final String TAG = AddMedicationActivity.class.getSimpleName();
     private static final int ADD_MEDICATION_DETAILS_LOADER_ID = 103;
 
     @Override
@@ -213,7 +213,7 @@ public class AddMedictionActivity extends AppCompatActivity {
                     Log.v(TAG, addUri.toString());
                     Toast.makeText(getBaseContext(), getResources().getString(R.string.insert_success), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getBaseContext(), getResources().getString(R.string.insert_success), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), getResources().getString(R.string.insert_error), Toast.LENGTH_LONG).show();
                     return false;
                 }
 

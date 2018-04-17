@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Ignore the UnusedResources issue in the given file -->
+    <issue id="UnusedResources">
+        <ignore path="res/mipmap-anydpi-v26/ic_launcher.xml" />
+        <ignore path="res/mipmap-hdpi/ic_launcher.png"/>
+        <ignore path="res/mipmap-mdpi/ic_launcher.png"/>
+        <ignore path="res/mipmap-xhdpi/ic_launcher.png"/>
+        <ignore path="res/mipmap-xxhdpi/ic_launcher.png"/>
+        <ignore path="res/mipmap-xxxhdpi/ic_launcher.png"/>
+    </issue>
+
+</lint>

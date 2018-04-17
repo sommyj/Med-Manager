@@ -35,7 +35,7 @@ public class MedicationDetailsActivity extends AppCompatActivity implements Load
     private TextView mDetailToTimeTextView;
 
     private String medId;
-    private String[] stringsForAddMedictionActivity;
+    public static String[] stringsForAddMedictionActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +74,9 @@ public class MedicationDetailsActivity extends AppCompatActivity implements Load
     public boolean onOptionsItemSelected(MenuItem menuItem){
         int itemThatWasSelected = menuItem.getItemId();
         if(itemThatWasSelected == R.id.action_edit) {
-            Intent startAddMedicationActivityIntent = new Intent(this, AddMedictionActivity.class);
+            Intent startAddMedicationActivityIntent = new Intent(this, AddMedicationActivity.class);
             startAddMedicationActivityIntent.putExtra(Intent.EXTRA_TEXT, true);
-            startAddMedicationActivityIntent.putExtra("valuesForAddmedicationActivity", stringsForAddMedictionActivity);
+           startAddMedicationActivityIntent.putExtra("valuesForAddmedicationActivity", stringsForAddMedictionActivity);
             startActivity(startAddMedicationActivityIntent);
         }
         return super.onOptionsItemSelected(menuItem);
@@ -154,4 +154,5 @@ public class MedicationDetailsActivity extends AppCompatActivity implements Load
         mDetailToTimeTextView.setText(endDateString);
 
     }
+
 }

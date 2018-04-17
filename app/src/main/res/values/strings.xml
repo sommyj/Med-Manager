@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Med-Manager</string>
-    <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
     <string name="action_save">Save</string>
     <string name="action_edit">Edit</string>
@@ -33,7 +32,6 @@
     <!--activity_medication_details-->
     <string name="from_label">From : </string>
     <string name="to_label">To : </string>
-    <string name="comma">, </string>
 
     <!--drawer_view-->
     <string name="nav_updateProfile">Update Profile</string>

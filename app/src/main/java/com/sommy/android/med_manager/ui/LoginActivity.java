@@ -3,6 +3,10 @@ package com.sommy.android.med_manager.ui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.sommy.android.med_manager.IdlingResource.SimpleIdlingResource;
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.utilities.PreferenceUtilities;
 
@@ -25,6 +30,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
+
+    // The Idling Resource which will be null in production.
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +103,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void signIn() {
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(false);
+        }
+
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -116,6 +141,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             PreferenceUtilities.setId(this, id);
             PreferenceUtilities.setFirstName(this, firstName);
             PreferenceUtilities.setLastName(this, lastName);
+
+            if (mIdlingResource != null) {
+                mIdlingResource.setIdleState(true);
+            }
 
             // Signed in successfully, show authenticated UI.
             updateUI(account);
