@@ -1,4 +1,4 @@
-package com.sommy.android.med_manager.utilities;
+package com.sommy.android.med_manager.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

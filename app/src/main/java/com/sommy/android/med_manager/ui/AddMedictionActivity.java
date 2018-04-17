@@ -22,11 +22,14 @@ import android.widget.Toast;
 
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.provider.MedicationContract;
+import com.sommy.android.med_manager.sync.ReminderUtilities;
 
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import static java.text.DateFormat.getDateTimeInstance;
 
 public class AddMedictionActivity extends AppCompatActivity {
     private EditText mNameEditText;
@@ -38,18 +41,20 @@ public class AddMedictionActivity extends AppCompatActivity {
     private String[] valuesFromMedicationDetailsActivity;
     private Calendar startDate;
     private Calendar endDate;
-    private Context context = this;
+    private Context context;
+    private String updateId;
 
-    private SimpleDateFormat sDateFormat =new SimpleDateFormat("E, MMM dd yyyy HH:mm:ss");
+    private DateFormat sDateFormat = getDateTimeInstance();
 
     private static final String TAG = AddMedictionActivity.class.getSimpleName();
+    private static final int ADD_MEDICATION_DETAILS_LOADER_ID = 103;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_mediction);
 
-        ActionBar actionBar= getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         // Set the action bar back button to look like an up button
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -60,6 +65,8 @@ public class AddMedictionActivity extends AppCompatActivity {
         mIntervalEditText = findViewById(R.id.interval_EditText);
         mStartDateEditText = findViewById(R.id.startDate_EditText);
         mEndDateEditText = findViewById(R.id.endDate_EditText);
+
+        context = this;
 
 
         startDate = Calendar.getInstance();
@@ -74,10 +81,11 @@ public class AddMedictionActivity extends AppCompatActivity {
 
         Intent intentThatStartedThisActivity = getIntent();
 
-        if(intentThatStartedThisActivity.hasExtra("valuesForAddmedicationActivity")) {
+        if (intentThatStartedThisActivity.hasExtra("valuesForAddmedicationActivity")) {
             setTitle(R.string.editMedication_label);
             valuesFromMedicationDetailsActivity = intentThatStartedThisActivity.getStringArrayExtra("valuesForAddmedicationActivity");
 
+            updateId = valuesFromMedicationDetailsActivity[0];
             //set values on view
             mNameEditText.setText(valuesFromMedicationDetailsActivity[1]);
             mDescriptionEditText.setText(valuesFromMedicationDetailsActivity[2]);
@@ -86,15 +94,14 @@ public class AddMedictionActivity extends AppCompatActivity {
             mEndDateEditText.setText(valuesFromMedicationDetailsActivity[5]);
         }
 
-
     }
 
-    private void setFocusOnStartDateEditText(EditText startDateEditText){
+    private void setFocusOnStartDateEditText(EditText startDateEditText) {
         startDateEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
 
-                if(hasFocus) {
+                if (hasFocus) {
                     final Calendar currentDate = Calendar.getInstance();
                     new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
                         @Override
@@ -108,7 +115,7 @@ public class AddMedictionActivity extends AppCompatActivity {
                                     Log.v(TAG, "The choosen one " + startDate.getTime());
 
                                     String startDateString = sDateFormat.format(startDate.getTimeInMillis());
-                                        mStartDateEditText.setText(startDateString);
+                                    mStartDateEditText.setText(startDateString);
                                 }
                             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
                         }
@@ -119,7 +126,7 @@ public class AddMedictionActivity extends AppCompatActivity {
 
     }
 
-    private void setFocusOnEndDateEditText(EditText endDateEditText){
+    private void setFocusOnEndDateEditText(EditText endDateEditText) {
         mStartDateEditText.clearFocus();
         endDateEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -165,8 +172,8 @@ public class AddMedictionActivity extends AppCompatActivity {
             String startDateString = mStartDateEditText.getText().toString();
             String endDateString = mEndDateEditText.getText().toString();
 
-            if(nameString.length()==0||descriptionString.length()==0||intervalString.length()==0
-                    ||startDateString.length()==0||endDateString.length() == 0) {
+            if (nameString.length() == 0 || descriptionString.length() == 0 || intervalString.length() == 0
+                    || startDateString.length() == 0 || endDateString.length() == 0) {
                 Snackbar.make(findViewById(android.R.id.content), getResources().getString(R.string.addMediction_validation), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 return false;
@@ -175,8 +182,8 @@ public class AddMedictionActivity extends AppCompatActivity {
             Date startDate = null;
             Date endDate = null;
             try {
-                startDate =sDateFormat.parse(startDateString);
-                endDate =sDateFormat.parse(endDateString);
+                startDate = sDateFormat.parse(startDateString);
+                endDate = sDateFormat.parse(endDateString);
             } catch (ParseException e) {
                 e.printStackTrace();
                 Toast.makeText(getBaseContext(), getResources().getString(R.string.date_error), Toast.LENGTH_LONG).show();
@@ -188,43 +195,50 @@ public class AddMedictionActivity extends AppCompatActivity {
             long startDateLong = startDate.getTime();
             long endDateLong = endDate.getTime();
             // Insert new task data via a ContentResolver
-                // Create new empty ContentValues object
-                ContentValues contentValues = new ContentValues();
-                // Put the medication values into the ContentValues
-                contentValues.put(MedicationContract.MedicationEntry.COLUMN_NAME, nameString);
-                contentValues.put(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION, descriptionString);
-                contentValues.put(MedicationContract.MedicationEntry.COLUMN_INTERVAL, intervalInt);
-                contentValues.put(MedicationContract.MedicationEntry.COLUMN_START_DATE, startDateLong);
-                contentValues.put(MedicationContract.MedicationEntry.COLUMN_END_DATE, endDateLong);
+            // Create new empty ContentValues object
+            ContentValues contentValues = new ContentValues();
+            // Put the medication values into the ContentValues
+            contentValues.put(MedicationContract.MedicationEntry.COLUMN_NAME, nameString);
+            contentValues.put(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION, descriptionString);
+            contentValues.put(MedicationContract.MedicationEntry.COLUMN_INTERVAL, intervalInt);
+            contentValues.put(MedicationContract.MedicationEntry.COLUMN_START_DATE, startDateLong);
+            contentValues.put(MedicationContract.MedicationEntry.COLUMN_END_DATE, endDateLong);
 
-            if(valuesFromMedicationDetailsActivity == null) {
+            if (valuesFromMedicationDetailsActivity == null) {
                 // Insert the content values via a ContentResolver
                 Uri addUri = getContentResolver().insert(MedicationContract.MedicationEntry.CONTENT_URI, contentValues);
 
                 // Display the status that's returned with a Toast
                 if (addUri != null) {
-                    Log.v(TAG, "uri.toString()");
+                    Log.v(TAG, addUri.toString());
                     Toast.makeText(getBaseContext(), getResources().getString(R.string.insert_success), Toast.LENGTH_LONG).show();
-                }else{
+                } else {
                     Toast.makeText(getBaseContext(), getResources().getString(R.string.insert_success), Toast.LENGTH_LONG).show();
                     return false;
                 }
-            }else {
+
+                String addId = addUri.getPathSegments().get(1);
+
+                Log.d(TAG, addId + "++++++++++");
+                ReminderUtilities.scheduleChargingReminder(this, intervalInt, addId);
+            } else {
                 Uri updateUri = MedicationContract.MedicationEntry.CONTENT_URI;
                 updateUri = updateUri.buildUpon().appendPath(valuesFromMedicationDetailsActivity[0]).build();
 
                 int updatedCount = getContentResolver().update(updateUri, contentValues, null, null);
-                if(updatedCount == 1) {
+                if (updatedCount == 1) {
                     Toast.makeText(getBaseContext(), getResources().getString(R.string.update_success), Toast.LENGTH_LONG).show();
-                } else{
+                } else {
                     Toast.makeText(getBaseContext(), getResources().getString(R.string.update_error), Toast.LENGTH_LONG).show();
                     return false;
                 }
+                Log.d(TAG, "++++++++++" + updateId + "++++++++++");
+                ReminderUtilities.scheduleChargingReminder(this, intervalInt, updateId);
             }
 
 
-                // Finish activity (this returns back to MainActivity)
-                finish();
+            // Finish activity (this returns back to MainActivity)
+            finish();
         }
         return super.onOptionsItemSelected(menuItem);
     }

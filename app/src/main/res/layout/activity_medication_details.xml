@@ -8,126 +8,136 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/detailTitle_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/labelTopBottom_margin"
-        android:gravity="center_horizontal"
-        android:textSize="34sp"
-        android:textStyle="bold"
-        android:textAllCaps="true"
-        tools:text="Anti-Parasite" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/editLabelTop_margin"
-        android:layout_marginLeft="@dimen/side_margin"
-        android:layout_marginRight="@dimen/side_margin"
-        android:background="@drawable/shadow"/>
-
-    <TextView
-        android:id="@+id/detailDescription_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/editLabelTop_margin"
-        android:layout_marginLeft="@dimen/side_margin"
-        android:paddingLeft="@dimen/side_margin"
-        android:layout_marginRight="@dimen/side_margin"
-        android:gravity="center_horizontal"
-        android:ellipsize="end"
-        android:maxLines="8"
-        tools:text="kkkkkkkkkkkkjkbhhbbbhhbvhhhbhvjbbvhjbvhjbhhl;jhb;kb;sddvjbvbvbxcv;cbv;kjbc;kvbkjvb;xkcbbcbvjbjv;kbc;kzb;kbcjvbvjbk;jnbvn;vnjjbjjjjbvnjzjnjvjj'jv;ind jvjbfvkjkjz  bjvj jbjnbcj vnmvjnbj nc jck j j nkm jb j jn /x xn jb nj" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/editLabelTop_margin"
-        android:layout_marginLeft="@dimen/side_margin"
-        android:layout_marginRight="@dimen/side_margin"
-        android:background="@drawable/shadow"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/editLabelTop_margin"
-        android:layout_marginLeft="@dimen/side_margin"
-        android:paddingRight="@dimen/side_margin"
-        android:gravity="center_horizontal">
-
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/detailTitle_textView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/labelTopBottom_margin"
+            android:gravity="center_horizontal"
+            android:textAllCaps="true"
+            android:textSize="34sp"
             android:textStyle="bold"
-            android:text="@string/intervalIndicator_label"/>
+            tools:text="Anti-Parasite" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="@dimen/side_margin"
+            android:layout_marginRight="@dimen/side_margin"
+            android:layout_marginTop="@dimen/editLabelTop_margin"
+            android:background="@drawable/shadow" />
 
         <TextView
-            android:id="@+id/detailInterval_textView"
-            android:layout_marginLeft="@dimen/labelSpace"
+            android:id="@+id/detailDescription_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="12 hrs" />
+            android:layout_marginLeft="@dimen/side_margin"
+            android:layout_marginRight="@dimen/side_margin"
+            android:layout_marginTop="@dimen/editLabelTop_margin"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="8"
+            android:paddingLeft="@dimen/side_margin"
+            android:paddingStart="@dimen/side_margin"
+            tools:text="kkkkkkkkkkkkjkbhhbbbhhbvhhhbhvjbbvhjbvhjbhhl;jhb;kb;sddvjbvbvbxcv;cbv;kjbc;kvbkjvb;xkcbbcbvjbjv;kbc;kzb;kbcjvbvjbk;jnbvn;vnjjbjjjjbvnjzjnjvjj'jv;ind jvjbfvkjkjz  bjvj jbjnbcj vnmvjnbj nc jck j j nkm jb j jn /x xn jb nj" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="@dimen/side_margin"
+            android:layout_marginRight="@dimen/side_margin"
+            android:layout_marginTop="@dimen/editLabelTop_margin"
+            android:background="@drawable/shadow" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/side_margin"
+            android:layout_marginStart="@dimen/side_margin"
+            android:layout_marginTop="@dimen/editLabelTop_margin"
+            android:gravity="center_horizontal"
+            android:paddingEnd="@dimen/side_margin"
+            android:paddingRight="@dimen/side_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/intervalIndicator_label"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/detailInterval_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/labelSpace"
+                android:layout_marginStart="@dimen/labelSpace"
+                tools:text="12 hrs" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="@dimen/side_margin"
+            android:layout_marginRight="@dimen/side_margin"
+            android:layout_marginTop="@dimen/editLabelTop_margin"
+            android:background="@drawable/shadow" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/side_margin"
+            android:layout_marginStart="@dimen/side_margin"
+            android:layout_marginTop="@dimen/editLabelTop_margin"
+            android:gravity="center_horizontal"
+            android:paddingEnd="@dimen/side_margin"
+            android:paddingRight="@dimen/side_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/from_label"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/detailFromTime_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/labelSpace"
+                android:layout_marginStart="@dimen/labelSpace"
+                tools:text="2:30pm, 3rd fed 2018" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/side_margin"
+            android:layout_marginStart="@dimen/side_margin"
+            android:layout_marginTop="@dimen/editLabelTop_margin"
+            android:gravity="center_horizontal"
+            android:paddingEnd="@dimen/side_margin"
+            android:paddingRight="@dimen/side_margin">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/to_label"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/detailToTime_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/labelSpace"
+                tools:text="3:30pm, 3rd fed 2018"
+                android:layout_marginStart="@dimen/labelSpace" />
+
+        </LinearLayout>
+
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/editLabelTop_margin"
-        android:layout_marginLeft="@dimen/side_margin"
-        android:layout_marginRight="@dimen/side_margin"
-        android:background="@drawable/shadow"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/editLabelTop_margin"
-        android:layout_marginLeft="@dimen/side_margin"
-        android:paddingRight="@dimen/side_margin"
-        android:gravity="center_horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/from_label"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/detailFromTime_textView"
-            android:layout_marginLeft="@dimen/labelSpace"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="2:30pm, 3rd fed 2018" />
-
-    </LinearLayout>
-
-    <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/editLabelTop_margin"
-    android:layout_marginLeft="@dimen/side_margin"
-    android:paddingRight="@dimen/side_margin"
-    android:gravity="center_horizontal">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:text="@string/to_label"/>
-
-    <TextView
-        android:id="@+id/detailToTime_textView"
-        android:layout_marginLeft="@dimen/labelSpace"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="3:30pm, 3rd fed 2018" />
-
-</LinearLayout>
-
-</LinearLayout>
 
 </ScrollView>
 

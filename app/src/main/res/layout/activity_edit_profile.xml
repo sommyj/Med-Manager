@@ -1,53 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="com.sommy.android.med_manager.ui.UpdateProfileActivity">
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/labelTopBottom_margin"
         android:layout_marginLeft="@dimen/side_margin"
-        android:text="@string/profileName_label" />
+        android:text="@string/profileFirstName_label"
+        android:layout_marginStart="@dimen/side_margin" />
 
     <EditText
+        android:id="@+id/profileFirstName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/editText_margin"
         android:layout_marginLeft="@dimen/side_margin"
-        android:layout_marginRight="@dimen/side_margin" />
+        android:layout_marginRight="@dimen/side_margin"
+        android:inputType="textPersonName" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/editLabelTop_margin"
         android:layout_marginLeft="@dimen/side_margin"
-        android:text="@string/profileUsername_label" />
+        android:text="@string/profileLastName_label"
+        android:layout_marginStart="@dimen/side_margin" />
 
     <EditText
+        android:id="@+id/profileLastName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/editText_margin"
         android:layout_marginLeft="@dimen/side_margin"
-        android:layout_marginRight="@dimen/side_margin" />
+        android:layout_marginRight="@dimen/side_margin"
+        android:inputType="textPersonName" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/editLabelTop_margin"
         android:layout_marginLeft="@dimen/side_margin"
-        android:text="@string/profileLocation_label" />
+        android:text="@string/profileUserName_label"
+        android:layout_marginStart="@dimen/side_margin" />
 
     <EditText
+        android:id="@+id/profileUserName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/editText_margin"
         android:layout_marginLeft="@dimen/side_margin"
-        android:layout_marginRight="@dimen/side_margin" />
+        android:layout_marginRight="@dimen/side_margin"
+        android:inputType="textPersonName" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/editLabelTop_margin"
+        android:layout_marginLeft="@dimen/side_margin"
+        android:text="@string/profileEmail_label"
+        android:layout_marginStart="@dimen/side_margin" />
 
-</LinearLayout>
+    <EditText
+        android:id="@+id/profileEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/editText_margin"
+        android:layout_marginLeft="@dimen/side_margin"
+        android:layout_marginRight="@dimen/side_margin"
+        android:inputType="textEmailAddress" />
+
+    </LinearLayout>
+
+</ScrollView>

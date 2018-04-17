@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:context="com.sommy.android.med_manager.ui.LoginActivity">
 
-    <com.sommy.android.med_manager.utilities.CustomTextView
+    <com.sommy.android.med_manager.ui.CustomTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="90dp"
@@ -20,7 +20,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="stay healthy"
+        android:text="@string/app_solgan"
         android:gravity="center_horizontal"
         android:textSize="24sp"/>
 

@@ -3,45 +3,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:elevation="4dp"
+    android:layout_margin="@dimen/allSide_margin"
     android:background="@drawable/shadow"
-    android:layout_margin="@dimen/allSide_margin">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/top_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/side_margin"
-        android:layout_marginBottom="6dp">
+        android:layout_marginBottom="6dp"
+        android:paddingTop="@dimen/side_margin">
 
         <TextView
             android:id="@+id/medTitle_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:textStyle="bold"
-            android:textAllCaps="true"
             android:paddingLeft="@dimen/side_margin"
+            android:paddingStart="@dimen/side_margin"
+            android:textAllCaps="true"
+            android:textStyle="bold"
             tools:text="gbbbbbbb" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingRight="@dimen/side_margin"
-            android:gravity="end">
+            android:gravity="end"
+            android:paddingEnd="@dimen/side_margin"
+            android:paddingRight="@dimen/side_margin">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Every : "/>
+                android:text="@string/intervalIndicator_label" />
 
-        <TextView
-            android:id="@+id/medInterval_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="12 hrs" />
+            <TextView
+                android:id="@+id/medInterval_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/labelSpace"
+                android:layout_marginStart="@dimen/labelSpace"
+                tools:text="12 hrs" />
         </LinearLayout>
     </LinearLayout>
 
@@ -49,28 +52,33 @@
         android:id="@+id/medDescription_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/side_margin"
+        android:layout_marginEnd="40dp"
         android:layout_marginRight="40dp"
         android:ellipsize="end"
         android:maxLines="4"
+        android:paddingLeft="@dimen/side_margin"
+        android:paddingStart="@dimen/side_margin"
         tools:text="kkkkkkkkkkkkjkbhhbbbhhbvhhhbhvjbbvhjbvhjbhhl;jhb;kb;sddvjbvbvbxcv;cbv;kjbc;kvbkjvb;xkcbbcbvjbjv;kbc;kzb;kbcjvbvjbk;jnbvn;vnjjbjjjjbvnjzjnjvjj'jv;ind jvjbfvkjkjz  bjvj jbjnbcj vnmvjnbj nc jck j j nkm jb j jn /x xn jb nj" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="end"
         android:paddingBottom="@dimen/side_margin"
-        android:paddingRight="@dimen/side_margin"
-        android:gravity="end">
+        android:paddingEnd="@dimen/side_margin"
+        android:paddingRight="@dimen/side_margin">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Remaining : "/>
+            android:text="@string/timeLeftIndicator_label" />
 
-    <TextView
-        android:id="@+id/medTimeLeft_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="8 days" />
+        <TextView
+            android:id="@+id/medTimeLeft_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/labelSpace"
+            android:layout_marginStart="@dimen/labelSpace"
+            tools:text="8 days" />
     </LinearLayout>
 </LinearLayout>

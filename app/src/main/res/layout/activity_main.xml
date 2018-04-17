@@ -56,7 +56,8 @@
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/side_margin"
             android:layout_marginTop="57dp"
-            android:background="@android:color/white">
+            android:background="@android:color/white"
+            android:paddingStart="@dimen/side_margin">
         </ExpandableListView>
 
     </android.support.design.widget.NavigationView>

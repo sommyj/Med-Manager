@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -15,6 +16,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.sommy.android.med_manager.R;
+import com.sommy.android.med_manager.utilities.PreferenceUtilities;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -50,9 +52,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
-        if(account != null){
+        if (account != null) {
             updateUI(account);
-        }else{
+        } else {
             // Set the dimensions of the sign-in button.
             signInButton = findViewById(R.id.sign_in_button);
             signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -60,19 +62,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
-    private void updateUI(GoogleSignInAccount account){
+    private void updateUI(GoogleSignInAccount account) {
 
         findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
 
-        String name = account.getDisplayName();
-        String email = account.getEmail();
-        String id = account.getId();
-        Uri photo = account.getPhotoUrl();
-
-        String[] strings = {name, email, id, String.valueOf(photo)};
-
         Intent startMainActivityIntent = new Intent(this, MainActivity.class);
-        startMainActivityIntent.putExtra(Intent.EXTRA_TEXT, strings );
         startActivity(startMainActivityIntent);
         finish();
     }
@@ -87,10 +81,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-        private void signIn() {
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, RC_SIGN_IN);
-        }
+    private void signIn() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -109,12 +103,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
+            String displayName = account.getDisplayName();
+            String firstName = account.getGivenName();
+            String lastName = account.getFamilyName();
+            String email = account.getEmail();
+            String id = account.getId();
+            Uri photo = account.getPhotoUrl();
+
+            //saving informationn from Google account
+            PreferenceUtilities.setDisplayName(this, displayName);
+            PreferenceUtilities.setEmailAddress(this, email);
+            PreferenceUtilities.setId(this, id);
+            PreferenceUtilities.setFirstName(this, firstName);
+            PreferenceUtilities.setLastName(this, lastName);
+
             // Signed in successfully, show authenticated UI.
             updateUI(account);
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            Toast.makeText(this, "signInResult:failed code=", Toast.LENGTH_SHORT).show();
             updateUI(null);
         }
     }

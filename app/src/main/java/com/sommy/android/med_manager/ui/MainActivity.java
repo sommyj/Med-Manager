@@ -1,43 +1,60 @@
 package com.sommy.android.med_manager.ui;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.sommy.android.med_manager.IdlingResource.SimpleIdlingResource;
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.model.ExpandedMenuModel;
+import com.sommy.android.med_manager.sync.ReminderUtilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_DESCRIPTION;
+import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_NAME;
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_START_DATE;
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.CONTENT_URI;
 
 public class MainActivity extends AppCompatActivity implements MedicationListAdapter.MedicationListOnClickHandler,
-        LoaderManager.LoaderCallbacks<Cursor>{
+        LoaderManager.LoaderCallbacks<Cursor>, SearchView.OnQueryTextListener {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int MEDICATION_LOADER_ID = 100;
 
     private RecyclerView mMedicationRecyclerView;
@@ -51,6 +68,22 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     private ExpandableListView expandableList;
     private List<ExpandedMenuModel> listDataHeader;
     private HashMap<ExpandedMenuModel, List<String>> listDataChild;
+
+    // The Idling Resource which will be null in production.
+    @Nullable
+    private SimpleIdlingResource mIdlingResource;
+
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +115,63 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
 
         mMedicationRecyclerView.setAdapter(medicationListAdapter);
 
+
+        /*
+         Add a touch helper to the RecyclerView to recognize when a user swipes to delete an item.
+         An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
+         and uses callbacks to signal when a user is performing these actions.
+         */
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            // Called when a user swipes left or right on a ViewHolder
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                // Retrieve the id of the task to delete
+                final int id = (int) viewHolder.itemView.getTag();
+
+
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(MainActivity.this);
+                }
+                builder.setTitle("Delete entry")
+                        .setMessage("Are you sure you want to delete this entry?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Build appropriate uri with String row id appended
+                                String stringId = Integer.toString(id);
+                                Uri uri = CONTENT_URI;
+                                uri = uri.buildUpon().appendPath(stringId).build();
+                                //Delete a single row of data using a ContentResolver
+                                getContentResolver().delete(uri, null, null);
+
+                                Log.d(TAG, stringId+"-----------");
+                                //Cancel dispatcher
+                                ReminderUtilities.cancelDispatcher(stringId);
+
+                                //Restart the loader to re-query for all tasks after a deletion
+                                getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                //Restart the loader to re-query for all tasks
+                                getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        }).attachToRecyclerView(mMedicationRecyclerView);
+
         //Expandable List
         expandableList = findViewById(R.id.navigationMenu);
         mDrawerLayout = findViewById(R.id.drawer_layout);
@@ -98,26 +188,9 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         // setting list adapter
         expandableList.setAdapter(mMenuAdapter);
 
-        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
-                //Log.d("DEBUG", "submenu item clicked");
-                    mDrawerLayout.closeDrawers();
-                return true;
-            }
-        });
-        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView expandableListView, View view, int groupPosition, long l) {
-                //Log.d("DEBUG", "heading clicked");
-                if(groupPosition == 2) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    return true;
-                }
-                return false;
-            }
-        });
+        //helper method for expandableOnClickListener
+        expandableOnClickListener();
+
 
 
 
@@ -139,7 +212,13 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
          * the last created loader is re-used.
          */
         getSupportLoaderManager().initLoader(MEDICATION_LOADER_ID, null, this);
+
+        Toast.makeText(this,getResources().getString(R.string.tutorial_message2), Toast.LENGTH_SHORT).show();
+
+        // Get the IdlingResource instance
+        getIdlingResource();
     }
+
 
     private void prepareListData() {
         listDataHeader = new ArrayList<>();
@@ -152,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
 
         // Adding child data
         List<String> heading1 = new ArrayList<String>();
+        heading1.add("All");
         heading1.add("January");
         heading1.add("February");
         heading1.add("March");
@@ -173,9 +253,57 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final MenuItem searchItem = menu.findItem(R.id.app_bar_search);
+        SearchView searchView = (SearchView) searchItem
+                .getActionView();
+//        if (null != searchView) {
+//            searchView.setSearchableInfo(searchManager
+//                    .getSearchableInfo(getComponentName()));
+//            searchView.setIconifiedByDefault(false);
+//        }
+
+        searchView.setOnQueryTextListener(this);
         return true;
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        if(query.length() == 0){
+            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
+        }else {
+            Bundle searchBundle = new Bundle();
+            searchBundle.putString("search", query);
+            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, searchBundle, MainActivity.this);
+        }
+
+        return true;
+    }
+
+    /**
+     * Called when the query text is changed by the user.
+     * @param newText
+     * @return
+     */
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        if(newText.length() == 0){
+            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
+        }else {
+            Bundle searchBundle = new Bundle();
+            searchBundle.putString("search", newText);
+            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, searchBundle, MainActivity.this);
+        }
+
+        return true;
+    }
+
+    /**
+     * Called when the user submits the query.
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -185,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.app_bar_search) {
+
             return true;
         }
         else if (id == android.R.id.home) {
@@ -267,6 +396,10 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     @Override
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(false);
+        }
+
         switch (loaderId) {
 
             case MEDICATION_LOADER_ID:
@@ -274,11 +407,24 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
 
 
             medication_uri = CONTENT_URI;
+            String selection = null;
+            String[] selectionArgs = null;
 
-            if(args != null)
-            medication_uri = medication_uri.buildUpon().appendPath(args.getString("")).build();
+            if(args != null && args.containsKey("startDate")){
+                medication_uri = medication_uri.buildUpon().appendPath(args.getString("startDate")).build();
+                selection = "strftime('%m', "+COLUMN_START_DATE+")" + "=?";
+            }
 
-        return new CursorLoader(this, medication_uri, null, null, null, COLUMN_START_DATE+" DESC");
+            if(args != null && args.containsKey("search")){
+
+                String s = args.getString("search");
+
+                selection = COLUMN_NAME+" like ? or " +COLUMN_DESCRIPTION+" like ?";
+                selectionArgs = new String[]{"'%"+s+"%'","'%"+s+"%'"};
+
+            }
+
+        return new CursorLoader(this, medication_uri, null, selection, selectionArgs, COLUMN_START_DATE+" DESC");
 
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loaderId);
@@ -298,9 +444,12 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
 
         if(data.getCount() == 0)
             showTutorialTextView();
-
-
+        else
         showMedicationDataView();
+
+        if (mIdlingResource != null) {
+            mIdlingResource.setIdleState(true);
+        }
     }
 
     /**
@@ -326,7 +475,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         /* First, hide the loading indicator */
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         /* Second, hide the tutorial message */
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mTutorialTextView.setVisibility(View.INVISIBLE);
         /* Finally, make sure the medication data is visible */
         mMedicationRecyclerView.setVisibility(View.VISIBLE);
     }
@@ -353,7 +502,91 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     private void showTutorialTextView(){
         /* Then, hide the medication data */
         mMedicationRecyclerView.setVisibility(View.INVISIBLE);
+         /* Finally, show the loading indicator */
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
         /* Finally, show the tutorial message */
         mTutorialTextView.setVisibility(View.VISIBLE);
     }
+
+    //helper method for expandableOnClickListener
+    private void expandableOnClickListener(){
+        expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
+                //Log.d("DEBUG", "submenu item clicked");
+                Bundle startDateBundle = new Bundle();
+                String startDateBundleKey = "startDate";
+                if(groupPosition == 0) {
+                    //passing month of start date to loader manager.
+                    switch (childPosition) {
+                        case 0:
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
+                            break;
+                        case 1:
+                            startDateBundle.putString(startDateBundleKey, "01");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 2:
+                            startDateBundle.putString(startDateBundleKey, "02");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 3:
+                            startDateBundle.putString(startDateBundleKey, "03");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 4:
+                            startDateBundle.putString(startDateBundleKey, "04");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 5:
+                            startDateBundle.putString(startDateBundleKey, "05");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 6:
+                            startDateBundle.putString(startDateBundleKey, "06");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 7:
+                            startDateBundle.putString(startDateBundleKey, "07");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 8:
+                            startDateBundle.putString(startDateBundleKey, "08");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 9:
+                            startDateBundle.putString(startDateBundleKey, "09");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 10:
+                            startDateBundle.putString(startDateBundleKey, "10");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 11:
+                            startDateBundle.putString(startDateBundleKey, "11");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        case 12:
+                            startDateBundle.putString(startDateBundleKey, "12");
+                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            break;
+                        default:
+                    }
+                }
+
+
+                mDrawerLayout.closeDrawers();
+                return true;
+            }
+        });
+        expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int groupPosition, long l) {
+                //Log.d("DEBUG", "heading clicked");
+                return false;
+            }
+        });
+
+    }
+
 }

@@ -83,27 +83,15 @@ public class MedicationContentProvider extends ContentProvider {
                         sortOrder);
                 break;
             case MEDICATION_WITH_ID:
-                selection = "_id=?";
-                String id = uri.getPathSegments().get(1);
+                String value = uri.getPathSegments().get(1);
                 retCursor = db.query(TABLE_NAME,
                         projection,
                         selection,
-                        new String[]{id},
+                        new String[]{value},
                         null,
                         null,
                         sortOrder);
                 break;
-//            case MEDICATION_WITH_START_DATE:
-//            selection = COLUMN_START_DATE + "=?";
-//                String startDate = uri.getPathSegments().get(1);
-//                retCursor = db.query(TABLE_NAME,
-//                        projection,
-//                        selection,
-//                        new String[]{startDate},
-//                        null,
-//                        null,
-//                        sortOrder);
-//                break;
             // Default exception
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

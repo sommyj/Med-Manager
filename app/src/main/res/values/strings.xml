@@ -10,7 +10,7 @@
 
     <!--medication_layout-->
     <string name="intervalIndicator_label">Every : </string>
-    <string name="timeLeftIndicator_label">Remaining : </string>
+    <string name="timeLeftIndicator_label">Duration : </string>
 
     <!--activity_add_medication-->
     <string name="addMedication_label">Add Medication</string>
@@ -20,13 +20,15 @@
     <string name="interval_label">Interval/Frequency (hrs)</string>
     <string name="startDate_label">Start Date</string>
     <string name="endDate_label">End Date</string>
+    <string name="tutorial_message2">Swipe left or right to delete &amp; click to edit</string>
 
 
     <!--activity_edit_profile-->
     <string name="editProfile_label">Edit Profile</string>
-    <string name="profileName_label">Name</string>
-    <string name="profileUsername_label">Username</string>
-    <string name="profileLocation_label">Location</string>
+    <string name="profileFirstName_label">First name</string>
+    <string name="profileLastName_label">last name</string>
+    <string name="profileUserName_label">Username</string>
+    <string name="profileEmail_label">Email</string>
 
     <!--activity_medication_details-->
     <string name="from_label">From : </string>
@@ -50,4 +52,8 @@
 
     <string name="insert_success">Insertion Successful</string>
     <string name="update_success">Updated Successfully!!!!</string>
+
+    <string name="medication_reminder_notification_title">Have you taken your medication?</string>
+    <string name="medication_reminder_notification_body">There is no better time to take you medication than now!!!</string>
+    <string name="app_solgan">stay healthy</string>
 </resources>

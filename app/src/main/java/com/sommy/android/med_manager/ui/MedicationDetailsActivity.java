@@ -17,11 +17,12 @@ import android.widget.TextView;
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.provider.MedicationContract;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Date;
 
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_START_DATE;
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.CONTENT_URI;
+import static java.text.DateFormat.getDateTimeInstance;
 
 public class MedicationDetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -92,7 +93,7 @@ public class MedicationDetailsActivity extends AppCompatActivity implements Load
 
                     medication_uri = medication_uri.buildUpon().appendPath(args.getString("medId")).build();
 
-                return new CursorLoader(this, medication_uri, null, null, null, COLUMN_START_DATE+" DESC");
+                return new CursorLoader(this, medication_uri, null, "_id=?", null, COLUMN_START_DATE+" DESC");
 
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loaderId);
@@ -132,7 +133,8 @@ public class MedicationDetailsActivity extends AppCompatActivity implements Load
         long startDateLong = data.getLong(startDateIndex);
         long endDateLong = data.getLong(endDateIndex);
 
-        SimpleDateFormat sDateFormat =new SimpleDateFormat("E, MMM dd yyyy HH:mm:ss");
+//        SimpleDateFormat sDateFormat =new SimpleDateFormat("E, MMM dd yyyy HH:mm:ss");
+        DateFormat sDateFormat = getDateTimeInstance();
         Date stateDate = new Date(startDateLong);
         Date endDate = new Date(endDateLong);
 

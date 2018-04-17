@@ -11,8 +11,10 @@ import android.widget.TextView;
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.provider.MedicationContract;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Date;
+
+import static java.text.DateFormat.getDateInstance;
 
 /**
  * Created by somto on 4/9/18.
@@ -24,11 +26,12 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
     private Cursor mCursor;
 
     /**
-     *An on-click handler
+     * An on-click handler
      */
     private final MedicationListOnClickHandler mClickHandler;
 
-    private static SimpleDateFormat sDateFormat = new SimpleDateFormat("dd MMM");
+//    private static SimpleDateFormat sDateFormat = new SimpleDateFormat("dd MMM");
+    private static DateFormat sDateFormat = getDateInstance();
 
 
     private static final long MINUTE_MILLIS = 1000 * 60;
@@ -78,29 +81,29 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
 
         // Change how the date is displayed depending on whether it was written in the last minute,
         // the hour, etc.
-        if(endDate > now) {
-            if (endDate - now < (WEEK_MILLIS)){
+        if (endDate > now) {
+            if (endDate - now < (WEEK_MILLIS)) {
                 if (endDate - now < (DAY_MILLIS)) {
                     if (endDate - now < (HOUR_MILLIS)) {
                         long minutes = Math.round((endDate - now) / MINUTE_MILLIS);
-                        date = String.valueOf(minutes) +" "+context.getResources().getString(R.string.minute);
+                        date = String.valueOf(minutes) + " " + context.getResources().getString(R.string.minute);
                     } else {
                         long minutes = Math.round((endDate - now) / HOUR_MILLIS);
-                        date = String.valueOf(minutes) +" "+context.getResources().getString(R.string.hour);
+                        date = String.valueOf(minutes) + " " + context.getResources().getString(R.string.hour);
                     }
                 } else {
                     long minutes = Math.round((endDate - now) / DAY_MILLIS);
-                    date = String.valueOf(minutes) +" "+context.getResources().getString(R.string.day);
+                    date = String.valueOf(minutes) + " " + context.getResources().getString(R.string.day);
                 }
-            } else{
+            } else {
                 Date dateDate = new Date(endDate);
                 date = sDateFormat.format(dateDate);
             }
-        }else {
+        } else {
             date = "ended";
         }
 
-        String intervalString = String.valueOf(interval) +" "+context.getResources().getString(R.string.hour);
+        String intervalString = String.valueOf(interval) + " " + context.getResources().getString(R.string.hour);
 
         //Set values
         holder.itemView.setTag(id);
