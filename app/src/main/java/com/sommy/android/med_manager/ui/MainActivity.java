@@ -45,6 +45,7 @@ import com.sommy.android.med_manager.sync.ReminderUtilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_DESCRIPTION;
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_NAME;
@@ -411,16 +412,24 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
             String[] selectionArgs = null;
 
             if(args != null && args.containsKey("startDate")){
-                medication_uri = medication_uri.buildUpon().appendPath(args.getString("startDate")).build();
-                selection = "strftime('%m', "+COLUMN_START_DATE+")" + "=?";
+                String monthValue = args.getString("startDate");
+//                medication_uri = medication_uri.buildUpon().appendPath(monthValue).build();
+                Toast.makeText(this, monthValue+".....", Toast.LENGTH_SHORT).show();
+                selection = "strftime('%m', "+COLUMN_START_DATE+")" + "='"+monthValue+"'";
+
+                Date date = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH).parse(string);
+
+
+
+
+
             }
 
             if(args != null && args.containsKey("search")){
 
-                String s = args.getString("search");
-
+                String searchValue = args.getString("search");
                 selection = COLUMN_NAME+" like ? or " +COLUMN_DESCRIPTION+" like ?";
-                selectionArgs = new String[]{"'%"+s+"%'","'%"+s+"%'"};
+                selectionArgs = new String[]{"%"+searchValue+"%","%"+searchValue+"%"};
 
             }
 
