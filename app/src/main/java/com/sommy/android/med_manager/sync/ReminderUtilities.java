@@ -32,7 +32,7 @@ public class ReminderUtilities {
     }
 
 
-    synchronized public static void scheduleChargingReminder(@NonNull final Context context, int interval, String id) {
+    synchronized public static void scheduleMedicationReminder(@NonNull final Context context, int interval, String id) {
         /*
          * Interval at which to remind the user to take medication. Use TimeUnit for convenience, rather
          * than writing out a bunch of multiplication ourselves and risk making a silly mistake.
@@ -73,7 +73,6 @@ public class ReminderUtilities {
                 .setTrigger(Trigger.executionWindow(
                         REMINDER_INTERVAL_SECONDS,
                         REMINDER_INTERVAL_SECONDS + SYNC_FLEXTIME_SECONDS))
-
                 /*
                  * If a Job with the tag will provided already exists, this new job will replace
                  * the old one.

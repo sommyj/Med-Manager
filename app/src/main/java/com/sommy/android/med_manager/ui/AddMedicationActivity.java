@@ -220,7 +220,7 @@ public class AddMedicationActivity extends AppCompatActivity {
                 String addId = addUri.getPathSegments().get(1);
 
                 Log.d(TAG, addId + "++++++++++");
-                ReminderUtilities.scheduleChargingReminder(this, intervalInt, addId);
+                ReminderUtilities.scheduleMedicationReminder(this, intervalInt, addId);
             } else {
                 Uri updateUri = MedicationContract.MedicationEntry.CONTENT_URI;
                 updateUri = updateUri.buildUpon().appendPath(valuesFromMedicationDetailsActivity[0]).build();
@@ -233,7 +233,7 @@ public class AddMedicationActivity extends AppCompatActivity {
                     return false;
                 }
                 Log.d(TAG, "++++++++++" + updateId + "++++++++++");
-                ReminderUtilities.scheduleChargingReminder(this, intervalInt, updateId);
+                ReminderUtilities.scheduleMedicationReminder(this, intervalInt, updateId);
             }
 
 

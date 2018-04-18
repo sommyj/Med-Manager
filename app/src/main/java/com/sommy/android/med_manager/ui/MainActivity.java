@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -353,8 +352,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
                                 break;
 
                             case R.id.nav_logout :
-                                Snackbar.make(findViewById(android.R.id.content), "Relax it is coming", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
+                                finish();
 
 
                         }

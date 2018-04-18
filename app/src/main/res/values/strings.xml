@@ -37,7 +37,7 @@
     <!--drawer_view-->
     <string name="nav_updateProfile">Update Profile</string>
     <string name="nav_addMedication">Add Medication</string>
-    <string name="nav_logout">Logout</string>
+    <string name="nav_Signout">Signout</string>
 
     <string name="minute">min</string>
     <string name="hour">hrs</string>
