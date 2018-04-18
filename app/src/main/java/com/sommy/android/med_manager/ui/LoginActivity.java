@@ -21,7 +21,12 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.sommy.android.med_manager.IdlingResource.SimpleIdlingResource;
 import com.sommy.android.med_manager.R;
-import com.sommy.android.med_manager.utilities.PreferenceUtilities;
+
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setDisplayName;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setEmailAddress;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setFirstName;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setId;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setLastName;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -136,11 +141,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Uri photo = account.getPhotoUrl();
 
             //saving informationn from Google account
-            PreferenceUtilities.setDisplayName(this, displayName);
-            PreferenceUtilities.setEmailAddress(this, email);
-            PreferenceUtilities.setId(this, id);
-            PreferenceUtilities.setFirstName(this, firstName);
-            PreferenceUtilities.setLastName(this, lastName);
+            if(displayName != null)
+            setDisplayName(this, displayName);
+            if(email != null)
+            setEmailAddress(this, email);
+            if(id != null)
+            setId(this, id);
+            if(firstName != null)
+            setFirstName(this, firstName);
+            if(lastName != null)
+            setLastName(this, lastName);
 
             if (mIdlingResource != null) {
                 mIdlingResource.setIdleState(true);

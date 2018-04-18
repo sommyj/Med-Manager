@@ -40,15 +40,16 @@ import android.widget.Toast;
 import com.sommy.android.med_manager.IdlingResource.SimpleIdlingResource;
 import com.sommy.android.med_manager.R;
 import com.sommy.android.med_manager.model.ExpandedMenuModel;
+import com.sommy.android.med_manager.provider.MedicationContract;
 import com.sommy.android.med_manager.sync.ReminderUtilities;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_DESCRIPTION;
-import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_NAME;
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.COLUMN_START_DATE;
 import static com.sommy.android.med_manager.provider.MedicationContract.MedicationEntry.CONTENT_URI;
 
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     private ProgressBar mLoadingIndicator;
     private MedicationListAdapter medicationListAdapter;
     private TextView mTutorialTextView;
+    private TextView mNoResultTextView;
+    private MenuItem searchItem;
 
     //Expandable List
     private DrawerLayout mDrawerLayout;
@@ -73,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     // The Idling Resource which will be null in production.
     @Nullable
     private SimpleIdlingResource mIdlingResource;
+
+    private Cursor mCursor;
 
     /**
      * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
@@ -98,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         mTutorialTextView = findViewById(R.id.tutorial_textView);
+        mNoResultTextView = findViewById(R.id.noResult_textView);
         mMedicationRecyclerView = findViewById(R.id.medication_recyclerView);
 
         /*
@@ -205,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
             }
         });
 
+        //show loading indicator
         showLoading();
 
         /*
@@ -220,7 +227,9 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         getIdlingResource();
     }
 
-
+    /**
+     * List labels for expandable view
+     */
     private void prepareListData() {
         listDataHeader = new ArrayList<>();
         listDataChild = new HashMap<>();
@@ -256,29 +265,22 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final MenuItem searchItem = menu.findItem(R.id.app_bar_search);
+        searchItem = menu.findItem(R.id.app_bar_search);
         SearchView searchView = (SearchView) searchItem
                 .getActionView();
-//        if (null != searchView) {
-//            searchView.setSearchableInfo(searchManager
-//                    .getSearchableInfo(getComponentName()));
-//            searchView.setIconifiedByDefault(false);
-//        }
 
         searchView.setOnQueryTextListener(this);
         return true;
     }
 
+    /**
+     * Called when the query text is submitted by the user
+     * @param query
+     * @return
+     */
     @Override
     public boolean onQueryTextSubmit(String query) {
-        if(query.length() == 0){
-            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
-        }else {
-            Bundle searchBundle = new Bundle();
-            searchBundle.putString("search", query);
-            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, searchBundle, MainActivity.this);
-        }
-
+        searchfilter(query);
         return true;
     }
 
@@ -289,14 +291,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
      */
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(newText.length() == 0){
-            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
-        }else {
-            Bundle searchBundle = new Bundle();
-            searchBundle.putString("search", newText);
-            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, searchBundle, MainActivity.this);
-        }
-
+        searchfilter(newText);
         return true;
     }
 
@@ -318,6 +313,12 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
             return true;
         }
         else if (id == android.R.id.home) {
+            SearchView searchView = (SearchView) searchItem
+                    .getActionView();
+            if (!searchView.isIconified()) {
+                searchView.setIconified(true);
+            }
+
             mDrawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
@@ -337,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
 
-                        // Add code here to update the UI based on the item selected
+                        // Update the UI based on the item selected
                         int id = item.getItemId();
 
                         switch (id){
@@ -411,28 +412,6 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
             String selection = null;
             String[] selectionArgs = null;
 
-            if(args != null && args.containsKey("startDate")){
-                String monthValue = args.getString("startDate");
-//                medication_uri = medication_uri.buildUpon().appendPath(monthValue).build();
-                Toast.makeText(this, monthValue+".....", Toast.LENGTH_SHORT).show();
-                selection = "strftime('%m', "+COLUMN_START_DATE+")" + "='"+monthValue+"'";
-
-                Date date = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH).parse(string);
-
-
-
-
-
-            }
-
-            if(args != null && args.containsKey("search")){
-
-                String searchValue = args.getString("search");
-                selection = COLUMN_NAME+" like ? or " +COLUMN_DESCRIPTION+" like ?";
-                selectionArgs = new String[]{"%"+searchValue+"%","%"+searchValue+"%"};
-
-            }
-
         return new CursorLoader(this, medication_uri, null, selection, selectionArgs, COLUMN_START_DATE+" DESC");
 
             default:
@@ -448,8 +427,41 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
      */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        mCursor =  data;
+
+        List<Integer> id = new ArrayList<>();
+        List<String> name = new ArrayList<>();
+        List<String> description = new ArrayList<>();
+        List<Integer> interval = new ArrayList<>();
+        List<Long> startDate = new ArrayList<>();
+        List<Long> endDate = new ArrayList<>();
+
+        // Indices for the _id, name, description, interval, start_date and end_date columns
+        int idIndex = data.getColumnIndex(MedicationContract.MedicationEntry._ID);
+        int nameIndex = data.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_NAME);
+        int descriptionIndex = data.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION);
+        int intervalIndex = data.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_INTERVAL);
+        int startDateIndex = data.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_START_DATE);
+        int endDateIndex = data.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_END_DATE);
+
+        int cursorCount = mCursor.getCount();
+
         data.moveToFirst();
-        medicationListAdapter.swapCursor(data);
+
+        for(int position=0; position < cursorCount; position++) {
+            data.moveToPosition(position); // get to the right location in the mCursor
+
+            id.add(data.getInt(idIndex));
+            name.add(data.getString(nameIndex));
+            description.add(data.getString(descriptionIndex));
+            interval.add(data.getInt(intervalIndex));
+            startDate.add(data.getLong(startDateIndex));
+            endDate.add(data.getLong(endDateIndex));
+        }
+
+        //passing data to the adapter
+        medicationListAdapter.setUpMedicationData(id, name, description, interval, startDate, endDate);
 
         if(data.getCount() == 0)
             showTutorialTextView();
@@ -470,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
      */
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        medicationListAdapter.swapCursor(null);
+        medicationListAdapter.setUpMedicationData(null, null, null, null, null, null);
     }
 
     /**
@@ -485,6 +497,8 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         /* Second, hide the tutorial message */
         mTutorialTextView.setVisibility(View.INVISIBLE);
+        /* hide the "no result" message */
+        mNoResultTextView.setVisibility(View.INVISIBLE);
         /* Finally, make sure the medication data is visible */
         mMedicationRecyclerView.setVisibility(View.VISIBLE);
     }
@@ -498,6 +512,10 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     private void showLoading() {
         /* Then, hide the medication data */
         mMedicationRecyclerView.setVisibility(View.INVISIBLE);
+        /* hide the the tutorial message */
+        mTutorialTextView.setVisibility(View.INVISIBLE);
+         /* hide the "no result" message */
+        mNoResultTextView.setVisibility(View.INVISIBLE);
         /* Finally, show the loading indicator */
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
@@ -511,10 +529,30 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
     private void showTutorialTextView(){
         /* Then, hide the medication data */
         mMedicationRecyclerView.setVisibility(View.INVISIBLE);
-         /* Finally, show the loading indicator */
+         /* hide the loading indicator */
         mLoadingIndicator.setVisibility(View.INVISIBLE);
+        /* hide the "no result" message */
+        mNoResultTextView.setVisibility(View.INVISIBLE);
         /* Finally, show the tutorial message */
         mTutorialTextView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * This method will make the "no result" message visible and hide the medication list View
+     <p>
+     * Since it is okay to redundantly set the visibility of a View, we don't need to check whether
+     * each view is currently visible or invisible.
+     */
+    private void showNoResultTextView(){
+        /* Then, hide the medication data */
+        mMedicationRecyclerView.setVisibility(View.INVISIBLE);
+         /* hide the loading indicator */
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        /* hide the the tutorial message */
+        mTutorialTextView.setVisibility(View.INVISIBLE);
+        /* Finally, show the "no result" message */
+        mNoResultTextView.setVisibility(View.VISIBLE);
+
     }
 
     //helper method for expandableOnClickListener
@@ -532,52 +570,40 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
                             getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, null, MainActivity.this);
                             break;
                         case 1:
-                            startDateBundle.putString(startDateBundleKey, "01");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(1);
                             break;
                         case 2:
-                            startDateBundle.putString(startDateBundleKey, "02");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(2);
                             break;
                         case 3:
-                            startDateBundle.putString(startDateBundleKey, "03");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(3);
                             break;
                         case 4:
-                            startDateBundle.putString(startDateBundleKey, "04");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(4);
                             break;
                         case 5:
-                            startDateBundle.putString(startDateBundleKey, "05");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(5);
                             break;
                         case 6:
-                            startDateBundle.putString(startDateBundleKey, "06");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(6);
                             break;
                         case 7:
-                            startDateBundle.putString(startDateBundleKey, "07");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(7);
                             break;
                         case 8:
-                            startDateBundle.putString(startDateBundleKey, "08");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(8);
                             break;
                         case 9:
-                            startDateBundle.putString(startDateBundleKey, "09");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(9);
                             break;
                         case 10:
-                            startDateBundle.putString(startDateBundleKey, "10");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(10);
                             break;
                         case 11:
-                            startDateBundle.putString(startDateBundleKey, "11");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(11);
                             break;
                         case 12:
-                            startDateBundle.putString(startDateBundleKey, "12");
-                            getSupportLoaderManager().restartLoader(MEDICATION_LOADER_ID, startDateBundle, MainActivity.this);
+                            filterDates(12);
                             break;
                         default:
                     }
@@ -596,6 +622,113 @@ public class MainActivity extends AppCompatActivity implements MedicationListAda
             }
         });
 
+    }
+
+    /**
+     * This method filters the recycler view according to the month the medication was registered(startdate)
+     * @param monthSelected
+     */
+    public void filterDates(int monthSelected){
+        int cursorCount = mCursor.getCount();
+
+        List<Integer> id = new ArrayList<>();
+        List<String> name = new ArrayList<>();
+        List<String> description = new ArrayList<>();
+        List<Integer> interval = new ArrayList<>();
+        List<Long> startDate = new ArrayList<>();
+        List<Long> endDate = new ArrayList<>();
+
+        // Indices for the _id, name, description, interval, start_date and end_date columns
+        int idIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry._ID);
+        int nameIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_NAME);
+        int descriptionIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION);
+        int intervalIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_INTERVAL);
+        int startDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_START_DATE);
+        int endDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_END_DATE);
+
+        for(int position=0; position < cursorCount; position++){
+            mCursor.moveToPosition(position); // get to the right location in the mCursor
+
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("M", Locale.ENGLISH);
+            Date dateDate = new Date(mCursor.getLong(startDateIndex));
+            String startDateMonth = simpleDateFormat.format(dateDate);
+
+
+            // Determine the values of the wanted data
+            if(monthSelected == Integer.parseInt(startDateMonth) ) {
+
+                id.add(mCursor.getInt(idIndex));
+                name.add(mCursor.getString(nameIndex));
+                description.add(mCursor.getString(descriptionIndex));
+                interval.add(mCursor.getInt(intervalIndex));
+                startDate.add(mCursor.getLong(startDateIndex));
+                endDate.add(mCursor.getLong(endDateIndex));
+
+                showMedicationDataView();
+            }
+
+        }
+
+        if(id.isEmpty() && name.isEmpty() && description.isEmpty() && interval.isEmpty()&& startDate.isEmpty() && endDate.isEmpty()){
+            showNoResultTextView();
+        }
+
+        //passing data to the adapter
+        medicationListAdapter.setUpMedicationData(id, name, description, interval, startDate, endDate);
+    }
+
+    /**
+     * This method performs the search operation on the recycler view
+     * @param searchValue
+     */
+    public void searchfilter(String searchValue){
+
+        int cursorCount = mCursor.getCount();
+
+        List<Integer> id = new ArrayList<>();
+        List<String> name = new ArrayList<>();
+        List<String> description = new ArrayList<>();
+        List<Integer> interval = new ArrayList<>();
+        List<Long> startDate = new ArrayList<>();
+        List<Long> endDate = new ArrayList<>();
+
+        // Indices for the _id, name, description, interval, start_date and end_date columns
+        int idIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry._ID);
+        int nameIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_NAME);
+        int descriptionIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION);
+        int intervalIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_INTERVAL);
+        int startDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_START_DATE);
+        int endDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_END_DATE);
+
+        for(int position=0; position < cursorCount; position++){
+            mCursor.moveToPosition(position); // get to the right location in the mCursor
+
+            String searchName = mCursor.getString(nameIndex);
+            String searchDescription = mCursor.getString(descriptionIndex);
+
+            // Determine the values of the wanted data
+            if(searchName.toLowerCase().contains(searchValue.toLowerCase()) ||
+                    searchDescription.toLowerCase().contains(searchValue.toLowerCase())) {
+
+                id.add(mCursor.getInt(idIndex));
+                name.add(mCursor.getString(nameIndex));
+                description.add(mCursor.getString(descriptionIndex));
+                interval.add(mCursor.getInt(intervalIndex));
+                startDate.add(mCursor.getLong(startDateIndex));
+                endDate.add(mCursor.getLong(endDateIndex));
+
+                showMedicationDataView();
+            }
+
+        }
+
+        if(id.isEmpty() && name.isEmpty() && description.isEmpty() && interval.isEmpty()&& startDate.isEmpty() && endDate.isEmpty()){
+            showNoResultTextView();
+        }
+
+        //passing data to the adapter
+        medicationListAdapter.setUpMedicationData(id, name, description, interval, startDate, endDate);
     }
 
 }

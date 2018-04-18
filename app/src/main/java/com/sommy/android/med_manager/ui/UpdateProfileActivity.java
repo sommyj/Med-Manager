@@ -9,7 +9,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sommy.android.med_manager.R;
-import com.sommy.android.med_manager.utilities.PreferenceUtilities;
+
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.getDisplayName;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.getEmailAddress;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.getFirstName;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.getLastName;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setDisplayName;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setEmailAddress;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setFirstName;
+import static com.sommy.android.med_manager.utilities.PreferenceUtilities.setLastName;
 
 public class UpdateProfileActivity extends AppCompatActivity {
 
@@ -34,14 +42,18 @@ public class UpdateProfileActivity extends AppCompatActivity {
         mProfileUserName = findViewById(R.id.profileUserName);
         mProfileEmail = findViewById(R.id.profileEmail);
 
-        String firstName = PreferenceUtilities.getFirstName(this);
-        String lastName = PreferenceUtilities.getLastName(this);
-        String userName = PreferenceUtilities.getDisplayName(this);
-        String email = PreferenceUtilities.getEmailAddress(this);
+        String firstName = getFirstName(this);
+        String lastName = getLastName(this);
+        String userName = getDisplayName(this);
+        String email = getEmailAddress(this);
 
+        if(firstName != null)
         mProfileFirstName.setText(firstName);
+        if(lastName != null)
         mProfileLastName.setText(lastName);
+        if(userName != null)
         mProfileUserName.setText(userName);
+        if(email != null)
         mProfileEmail.setText(email);
     }
 
@@ -54,10 +66,10 @@ public class UpdateProfileActivity extends AppCompatActivity {
         int itemThatWasSelected = menuItem.getItemId();
         if (itemThatWasSelected == R.id.action_save) {
 
-            PreferenceUtilities.setFirstName(this, mProfileFirstName.getText().toString());
-            PreferenceUtilities.setLastName(this, mProfileLastName.getText().toString());
-            PreferenceUtilities.setDisplayName(this, mProfileUserName.getText().toString());
-            PreferenceUtilities.setEmailAddress(this, mProfileEmail.getText().toString());
+            setFirstName(this, mProfileFirstName.getText().toString());
+            setLastName(this, mProfileLastName.getText().toString());
+            setDisplayName(this, mProfileUserName.getText().toString());
+            setEmailAddress(this, mProfileEmail.getText().toString());
 
             Toast.makeText(getBaseContext(), getResources().getString(R.string.update_success), Toast.LENGTH_LONG).show();
 

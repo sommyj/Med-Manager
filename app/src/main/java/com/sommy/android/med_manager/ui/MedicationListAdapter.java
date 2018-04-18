@@ -9,10 +9,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sommy.android.med_manager.R;
-import com.sommy.android.med_manager.provider.MedicationContract;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static java.text.DateFormat.getDateInstance;
 
@@ -39,11 +40,35 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
     private static final long DAY_MILLIS = 24 * HOUR_MILLIS;
     private static final long WEEK_MILLIS = 7 * DAY_MILLIS;
 
+    private List<Integer> id = new ArrayList<>();
+    private List<String> name = new ArrayList<>();
+    private List<String> description = new ArrayList<>();
+    private List<Integer> interval = new ArrayList<>();
+    private List<Long> startDate = new ArrayList<>();
+    private List<Long> endDate = new ArrayList<>();
+
+
+    /**
+     * Creates a MedicationListAdapter.
+     *
+     * @param context
+     * @param medicationListOnClickHandler The on-click handler for this adapter. This single handler is called
+     *                     when an item is clicked.
+     */
     public MedicationListAdapter(Context context, MedicationListOnClickHandler medicationListOnClickHandler) {
         this.context = context;
         this.mClickHandler = medicationListOnClickHandler;
     }
 
+    /**
+     * This gets called when each new ViewHolder is created. This happens when the RecyclerView
+     * is laid out. Enough ViewHolders will be created to fill the screen and allow for scrolling.
+     *
+     *@param parent The ViewGroup that these ViewHolders are contained within.
+     * @param viewType The ViewType integer is used to provide a different layout,
+     *                 if the RecyclerView has more than one type of item (which ours does).
+     * @return A new UserListAdapterViewHolder that holds the View for each list item
+     */
     @Override
     public MedicationListAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -55,26 +80,26 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
         return new MedicationListAdapterViewHolder(view);
     }
 
+
+    /**
+     * OnBindViewHolder is called by the RecyclerView to display the data at the specified
+     * position. In this method, we update the contents of the ViewHolder to display the Medication
+     * details for this particular position, using the "position" argument that is conveniently
+     * passed into us.
+     *
+     * @param holder The ViewHolder which should be updated to represent the
+     *                                  contents of the item at the given position in the data set.
+     * @param position                  The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(MedicationListAdapterViewHolder holder, int position) {
 
-        // Indices for the _id, name, description, interval, start_date and end_date columns
-        int idIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry._ID);
-        int nameIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_NAME);
-        int descriptionIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_DESCRIPTION);
-        int intervalIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_INTERVAL);
-        int startDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_START_DATE);
-        int endDateIndex = mCursor.getColumnIndex(MedicationContract.MedicationEntry.COLUMN_END_DATE);
-
-        mCursor.moveToPosition(position); // get to the right location in the cursor
-
-        // Determine the values of the wanted data
-        final int id = mCursor.getInt(idIndex);
-        String name = mCursor.getString(nameIndex);
-        String description = mCursor.getString(descriptionIndex);
-        int interval = mCursor.getInt(intervalIndex);
-        long startDate = mCursor.getLong(startDateIndex);
-        long endDate = mCursor.getLong(endDateIndex);
+        final int id = this.id.get(position);
+        String name = this.name.get(position);
+        String description = this.description.get(position);;
+        int interval = this.interval.get(position);
+        long startDate =this.startDate.get(position);
+        long endDate =this.endDate.get(position);
 
         String date = "";
         long now = System.currentTimeMillis();
@@ -119,27 +144,31 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
      */
     @Override
     public int getItemCount() {
-        if (mCursor == null) return 0;
-        return mCursor.getCount();
+        if (id == null) return 0;
+        return id.size();
     }
 
     /**
-     * When data changes and a re-query occurs, this function swaps the old Cursor
-     * with a newly updated Cursor (Cursor c) that is passed in.
+     * This method is used to set the medication details on a MedicationListAdapter if we've already
+     * created one. This is handy when we get new data from the database but don't want to create a
+     * new MedicationListAdapter to display it.
+     *
+     * @param id
+     * @param name
+     * @param description
+     * @param interval
+     * @param startDate
+     * @param endDate
      */
-    public Cursor swapCursor(Cursor c) {
-        // check if this cursor is the same as the previous cursor (mCursor)
-        if (mCursor == c) {
-            return null; // bc nothing has changed
-        }
-        Cursor temp = mCursor;
-        this.mCursor = c; // new cursor value assigned
+    void setUpMedicationData(List<Integer> id, List<String> name, List<String> description, List<Integer> interval, List<Long> startDate, List<Long> endDate){
 
-        //check if this is a valid cursor, then update the cursor
-        if (c != null) {
-            this.notifyDataSetChanged(); // Force the RecyclerView to refresh
-        }
-        return temp;
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.interval = interval;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        notifyDataSetChanged();
     }
 
     /**
@@ -171,14 +200,15 @@ public class MedicationListAdapter extends RecyclerView.Adapter<MedicationListAd
 
         }
 
+        /**
+         * passing the id when the recycler view is clicked
+         * @param view
+         */
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
 
-            mCursor.moveToPosition(position); // get to the right location in the cursor
-
-//            // Determine the values of the wanted data
-            int idInt = mCursor.getInt(mCursor.getColumnIndex(MedicationContract.MedicationEntry._ID));
+            int idInt = id.get(position);
             String idString = String.valueOf(idInt);
 
             mClickHandler.onClick(idString);

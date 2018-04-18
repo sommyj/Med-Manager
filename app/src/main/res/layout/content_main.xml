@@ -33,6 +33,15 @@
         android:textSize="42sp"
         android:visibility="invisible" />
 
+    <TextView
+        android:id="@+id/noResult_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="@string/noResult_message"
+        android:textSize="42sp"
+        android:visibility="invisible" />
+
 
 
 </FrameLayout>

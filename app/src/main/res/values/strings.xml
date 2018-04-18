@@ -6,6 +6,7 @@
 
     <!--activity_main & content_main-->
     <string name="tutorial_message">Click the add button to add medication</string>
+    <string name="noResult_message">No result</string>
 
     <!--medication_layout-->
     <string name="intervalIndicator_label">Every : </string>
